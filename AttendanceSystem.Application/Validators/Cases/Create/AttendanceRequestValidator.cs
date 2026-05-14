@@ -3,10 +3,10 @@ using FluentValidation;
 
 namespace AttendanceSystem.Application;
 
-public class CreateAttendanceRequestDtoValidator
+public class CreateAttendanceRequestValidator
     : AbstractValidator<CreateAttendanceRequestDto>
 {
-    public CreateAttendanceRequestDtoValidator()
+    public CreateAttendanceRequestValidator()
     {
         RuleFor(x => x.EmployeeId)
             .NotEmpty()

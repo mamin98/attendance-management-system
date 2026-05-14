@@ -2,10 +2,10 @@ using FluentValidation;
 
 namespace AttendanceSystem.Application;
 
-public class UpdateAttendanceRequestDtoValidator
+public class UpdateAttendanceRequestValidator
     : AbstractValidator<UpdateAttendanceRequestDto>
 {
-    public UpdateAttendanceRequestDtoValidator()
+    public UpdateAttendanceRequestValidator()
     {
         RuleFor(x => x.RequestType)
             .IsInEnum()

@@ -24,27 +24,26 @@ public class AttendanceRequestService(
             PageSize = data.PageSize
         };
     }
+    
     public async Task<List<AttendanceRequestDto>> GetAllAsync()
     {
         IReadOnlyList<AttendanceRequest> data = await _repository.GetAllAsync();
 
         return [.. data.Select(x => x.ToDto())];
     }
+    
     public async Task<AttendanceRequestDto?> GetByIdAsync(Guid id)
     {
         AttendanceRequest? entity = await _repository.GetByIdAsync(id);
-
         return entity?.ToDto();
     }
 
-    public async Task<Guid> CreateAsync(CreateAttendanceRequestDto dto)
+    public async Task CreateAsync(CreateAttendanceRequestDto dto)
     {
         AttendanceRequest entity = dto.ToEntity();
 
         await _repository.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
-
-        return entity.Id;
     }
     
     public async Task UpdateAsync(Guid id, UpdateAttendanceRequestDto dto)
