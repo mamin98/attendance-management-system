@@ -1,4 +1,6 @@
-namespace AttendanceSystem.Domain;
+using AttendanceSystem.Domain;
+
+namespace AttendanceSystem.Application;
 
 public class AttendanceRequestDto : AttendanceRequestBaseDto
 {
@@ -12,11 +14,32 @@ public class CreateAttendanceRequestDto : AttendanceRequestBaseDto
 {
     public Guid EmployeeId { get; set; }
     public RequestType RequestType { get; set; }
+
+    public AttendanceRequest ToEntity()
+    {
+        return AttendanceRequest.Create(
+            EmployeeId,
+            RequestType,
+            RequestDate,
+            FromTime,
+            ToTime,
+            Reason);
+    }
 }
 
 public class UpdateAttendanceRequestDto : AttendanceRequestBaseDto
 {    
    public RequestType RequestType { get; set; }
+
+   public AttendanceRequest UpdateEntity(AttendanceRequest request)
+   {        
+        return request.Update(
+            RequestType,
+            RequestDate,
+            FromTime,
+            ToTime,
+            Reason);
+    }   
 }
 
 

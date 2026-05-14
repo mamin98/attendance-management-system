@@ -1,4 +1,4 @@
-namespace AttendanceSystem.Domain;
+namespace AttendanceSystem.Application;
 
 public class EmployeeSimpleDto
 {

@@ -1,5 +1,3 @@
-using AttendanceSystem.Domain;
-
 namespace AttendanceSystem.Application;
 
 public interface IAttendanceRequestService

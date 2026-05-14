@@ -77,14 +77,4 @@ public class Employee : BaseEntity
         return this;
     }
 
-    public EmployeeSimpleDto ToSimpleDto()
-    {
-        return new EmployeeSimpleDto
-        {
-            Id = Id,
-            NameEnglish = NameEnglish,
-            NameArabic = NameArabic,
-        };
-    }
-
 }

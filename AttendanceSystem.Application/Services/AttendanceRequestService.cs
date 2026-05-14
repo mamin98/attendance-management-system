@@ -9,15 +9,9 @@ public class AttendanceRequestService(
     private readonly IAttendanceRequestRepository _repository = repository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<Guid> CreateAsync(CreateAttendanceRequestDto create)
+    public async Task<Guid> CreateAsync(CreateAttendanceRequestDto dto)
     {
-        var entity = AttendanceRequest.Create(
-            create.EmployeeId,
-            create.RequestType,
-            create.RequestDate,
-            create.FromTime,
-            create.ToTime,
-            create.Reason);
+        AttendanceRequest entity = dto.ToEntity();
 
         await _repository.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
@@ -27,7 +21,7 @@ public class AttendanceRequestService(
 
     public async Task<List<AttendanceRequestDto>> GetAllAsync()
     {
-        var data = await _repository.GetAllAsync();
+        IReadOnlyList<AttendanceRequest> data = await _repository.GetAllAsync();
 
         return [.. data.Select(x => x.ToDto())];
     }
@@ -46,11 +40,7 @@ public class AttendanceRequestService(
         if (entity is null)
             throw new Exception("Attendance request not found");
 
-        entity.Update(
-            dto.RequestDate,
-            dto.FromTime,
-            dto.ToTime,
-            dto.Reason);
+        dto.UpdateEntity(entity);
 
         _repository.Update(entity);
         await _unitOfWork.SaveChangesAsync();

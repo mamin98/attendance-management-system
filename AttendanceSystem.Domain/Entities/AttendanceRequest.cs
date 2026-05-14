@@ -85,11 +85,12 @@ public class AttendanceRequest : BaseEntity
          .ApplyData(employeeId, type, date, from, to, reason);
 
     public AttendanceRequest Update(
+     RequestType type,
      DateTime date,
      TimeSpan? from,
      TimeSpan? to,
      string? reason)
-     => ApplyData(EmployeeId, RequestType, date, from, to, reason);
+     => ApplyData(EmployeeId, type, date, from, to, reason);
 
     private AttendanceRequest ApplyData(
         Guid employeeId,
@@ -108,19 +109,4 @@ public class AttendanceRequest : BaseEntity
         return this;
     }
 
-
-    public AttendanceRequestDto ToDto()
-    {
-        return new AttendanceRequestDto 
-        {
-            Id = Id,
-            EmployeeData = Employee?.ToSimpleDto(),
-            RequestType = RequestType.ToString(),
-            RequestStatus = RequestStatus.ToString(),
-            RequestDate = RequestDate,
-            FromTime = FromTime,
-            ToTime = ToTime,
-            Reason = Reason
-        };
-    }
 }
