@@ -16,10 +16,9 @@ public static class DependencyInjection
                 configuration.GetConnectionString("DefaultConnection")));
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-
         services.AddScoped<IAttendanceRequestRepository, AttendanceRequestRepository>();
-
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IAttendanceRequestService, AttendanceRequestService>();
 
         return services;
     }
