@@ -9,6 +9,34 @@ public class AttendanceRequestService(
     private readonly IAttendanceRequestRepository _repository = repository;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
+    
+    public async Task<PagedResult<AttendanceRequestDto>> GetAllWithPaginationAsync(
+    int page,
+    int pageSize)
+    {
+        PagedResult<AttendanceRequest> data = await _repository.GetAllWithPaginationAsync(page, pageSize);
+
+        return new PagedResult<AttendanceRequestDto>
+        {
+            Items = [.. data.Items.Select(x => x.ToDto())],
+            TotalCount = data.TotalCount,
+            Page = data.Page,
+            PageSize = data.PageSize
+        };
+    }
+    public async Task<List<AttendanceRequestDto>> GetAllAsync()
+    {
+        IReadOnlyList<AttendanceRequest> data = await _repository.GetAllAsync();
+
+        return [.. data.Select(x => x.ToDto())];
+    }
+    public async Task<AttendanceRequestDto?> GetByIdAsync(Guid id)
+    {
+        AttendanceRequest? entity = await _repository.GetByIdAsync(id);
+
+        return entity?.ToDto();
+    }
+
     public async Task<Guid> CreateAsync(CreateAttendanceRequestDto dto)
     {
         AttendanceRequest entity = dto.ToEntity();
@@ -18,21 +46,7 @@ public class AttendanceRequestService(
 
         return entity.Id;
     }
-
-    public async Task<List<AttendanceRequestDto>> GetAllAsync()
-    {
-        IReadOnlyList<AttendanceRequest> data = await _repository.GetAllAsync();
-
-        return [.. data.Select(x => x.ToDto())];
-    }
-
-    public async Task<AttendanceRequestDto?> GetByIdAsync(Guid id)
-    {
-        AttendanceRequest? entity = await _repository.GetByIdAsync(id);
-
-        return entity?.ToDto();
-    }
-
+    
     public async Task UpdateAsync(Guid id, UpdateAttendanceRequestDto dto)
     {
         AttendanceRequest? entity = await _repository.GetByIdAsync(id);

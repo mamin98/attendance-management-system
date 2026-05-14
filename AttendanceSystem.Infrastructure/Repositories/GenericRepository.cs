@@ -14,12 +14,32 @@ public class GenericRepository<TEntity>
     {
         _context = context;
     }
+    
+    public async Task<PagedResult<TEntity>> GetPagedAsync(int page, int pageSize)
+    {
+        IQueryable<TEntity> query = _context.Set<TEntity>().AsQueryable();
 
-    public async Task<TEntity?> GetByIdAsync(Guid id)
-        => await _context.Set<TEntity>().FindAsync(id);
+        int totalCount = await query.CountAsync();
+
+        List<TEntity> items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResult<TEntity>
+        {
+            Items = items,
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        };
+    }
 
     public async Task<IReadOnlyList<TEntity>> GetAllAsync()
         => await _context.Set<TEntity>().ToListAsync();
+
+    public async Task<TEntity?> GetByIdAsync(Guid id)
+        => await _context.Set<TEntity>().FindAsync(id);
 
     public async Task AddAsync(TEntity entity)
         => await _context.Set<TEntity>().AddAsync(entity);
