@@ -1,4 +1,4 @@
-namespace AttendanceSystem.Domain.Common;
+namespace AttendanceSystem.Domain;
 
 public abstract class BaseEntity
 {

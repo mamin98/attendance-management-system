@@ -1,4 +1,5 @@
-namespace AttendanceSystem.Domain.Enums;
+namespace AttendanceSystem.Domain;
+
 public enum RequestType
 {
     Late = 1,

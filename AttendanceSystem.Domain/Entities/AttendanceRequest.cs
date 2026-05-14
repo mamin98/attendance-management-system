@@ -1,6 +1,4 @@
-using AttendanceSystem.Domain.Common;
-using AttendanceSystem.Domain.Enums;
-namespace AttendanceSystem.Domain.Entities;
+namespace AttendanceSystem.Domain;
 
 public class AttendanceRequest : BaseEntity
 {

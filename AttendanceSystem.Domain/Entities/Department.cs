@@ -1,6 +1,4 @@
-using AttendanceSystem.Domain.Common;
-
-namespace AttendanceSystem.Domain.Entities;
+namespace AttendanceSystem.Domain;
 
 public class Department : BaseEntity
 {

@@ -1,7 +1,5 @@
-using AttendanceSystem.Domain.Common;
-using AttendanceSystem.Domain.Enums;
+namespace AttendanceSystem.Domain;
 
-namespace AttendanceSystem.Domain.Entities;
 public class Employee : BaseEntity
 {
     public string NameEnglish { get; private set; } = string.Empty;
