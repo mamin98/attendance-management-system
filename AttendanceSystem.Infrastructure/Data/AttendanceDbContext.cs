@@ -1,14 +1,12 @@
-using AttendanceSystem.Domain.Common;
-using AttendanceSystem.Domain.Entities;
+using AttendanceSystem.Domain;
 using Microsoft.EntityFrameworkCore;
-using AttendanceSystem.Domain.Enums;
 using System.Reflection;
 
-namespace AttendanceSystem.Infrastructure.Data;
+namespace AttendanceSystem.Infrastructure;
 
-public class AppDbContext : DbContext
+public class AttendanceDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options)
+    public AttendanceDbContext(DbContextOptions<AttendanceDbContext> options)
         : base(options)
     {
     }
@@ -67,7 +65,7 @@ public class AppDbContext : DbContext
             if (!typeof(BaseEntity).IsAssignableFrom(entityType.ClrType))
                 continue;
 
-            var method = typeof(AppDbContext)
+            var method = typeof(AttendanceDbContext)
                 .GetMethod(nameof(SetSoftDeleteFilter),
                     BindingFlags.NonPublic | BindingFlags.Static)!
                 .MakeGenericMethod(entityType.ClrType);
