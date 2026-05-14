@@ -1,6 +1,7 @@
 using AttendanceSystem.Domain.Common;
 using AttendanceSystem.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using AttendanceSystem.Domain.Enums;
 using System.Reflection;
 
 namespace AttendanceSystem.Infrastructure.Data;

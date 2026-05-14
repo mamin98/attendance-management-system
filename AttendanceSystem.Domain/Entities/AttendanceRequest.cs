@@ -25,7 +25,7 @@ public class AttendanceRequest : BaseEntity
         return this;
     }
 
-    private AttendanceRequest Approve()
+    public AttendanceRequest Approve()
     {
         if (RequestStatus != RequestStatus.Pending)
             throw new InvalidOperationException("Only pending requests can be approved");
@@ -34,7 +34,7 @@ public class AttendanceRequest : BaseEntity
         return this;
     }
 
-    private AttendanceRequest Reject()
+    public AttendanceRequest Reject()
     {
         if (RequestStatus != RequestStatus.Pending)
             throw new InvalidOperationException("Only pending requests can be rejected");
@@ -43,7 +43,7 @@ public class AttendanceRequest : BaseEntity
         return this;
     }
 
-    private AttendanceRequest Cancel()
+    public AttendanceRequest Cancel()
     {
         if (RequestStatus != RequestStatus.Pending)
             throw new InvalidOperationException("Only pending requests can be cancelled");
@@ -58,7 +58,7 @@ public class AttendanceRequest : BaseEntity
         return this;
     }
 
-    private AttendanceRequest SetTime(TimeOnly? from, TimeOnly? to)
+    private AttendanceRequest SetTime(TimeSpan? from, TimeSpan? to)
     {
         if (from.HasValue && to.HasValue && from > to)
             throw new ArgumentException("FromTime cannot be greater than ToTime");
@@ -76,23 +76,23 @@ public class AttendanceRequest : BaseEntity
     }
 
 
-   public static AttendanceRequest Create(
-    Guid employeeId,
-    RequestType type,
-    DateTime date,
-    TimeSpan? from,
-    TimeSpan? to,
-    string? reason = null)
-    => new AttendanceRequest()
-        .ApplyData(employeeId, type, date, from, to, reason);
+    public static AttendanceRequest Create(
+     Guid employeeId,
+     RequestType type,
+     DateTime date,
+     TimeSpan? from,
+     TimeSpan? to,
+     string? reason = null)
+     => new AttendanceRequest()
+         .ApplyData(employeeId, type, date, from, to, reason);
 
-   public AttendanceRequest Update(
-    DateTime date,
-    TimeSpan? from,
-    TimeSpan? to,
-    string? reason)
-    => ApplyData(EmployeeId, RequestType, date, from, to, reason);        
-    
+    public AttendanceRequest Update(
+     DateTime date,
+     TimeSpan? from,
+     TimeSpan? to,
+     string? reason)
+     => ApplyData(EmployeeId, RequestType, date, from, to, reason);
+
     private AttendanceRequest ApplyData(
         Guid employeeId,
         RequestType type,
