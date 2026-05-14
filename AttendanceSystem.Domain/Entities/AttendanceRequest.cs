@@ -58,9 +58,6 @@ public class AttendanceRequest : BaseEntity
 
     private AttendanceRequest SetTime(TimeSpan? from, TimeSpan? to)
     {
-        if (from.HasValue && to.HasValue && from > to)
-            throw new ArgumentException("FromTime cannot be greater than ToTime");
-
         FromTime = from;
         ToTime = to;
 

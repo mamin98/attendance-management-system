@@ -1,5 +1,6 @@
 using AttendanceSystem.Infrastructure;
 using AttendanceSystem.Application;
+using FluentValidation.AspNetCore;
 
 namespace AttendanceSystem.API
 {
@@ -13,11 +14,16 @@ namespace AttendanceSystem.API
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddApplication();
 
+            builder.Services
+            .AddFluentValidationAutoValidation()
+            .AddFluentValidationClientsideAdapters();
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+    
+    
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
