@@ -108,4 +108,19 @@ public class AttendanceRequest : BaseEntity
         return this;
     }
 
+
+    public AttendanceRequestDto ToDto()
+    {
+        return new AttendanceRequestDto 
+        {
+            Id = Id,
+            EmployeeData = Employee?.ToSimpleDto(),
+            RequestType = RequestType.ToString(),
+            RequestStatus = RequestStatus.ToString(),
+            RequestDate = RequestDate,
+            FromTime = FromTime,
+            ToTime = ToTime,
+            Reason = Reason
+        };
+    }
 }
