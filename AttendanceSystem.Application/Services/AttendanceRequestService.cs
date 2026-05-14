@@ -40,6 +40,9 @@ public class AttendanceRequestService(
         if (entity is null)
             throw new Exception("Attendance request not found");
 
+        if (entity.RequestStatus != RequestStatus.Pending)
+            throw new Exception("Only pending requests can be updated");
+        
         dto.UpdateEntity(entity);
 
         _repository.Update(entity);
