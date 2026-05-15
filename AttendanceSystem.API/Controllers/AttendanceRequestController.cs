@@ -121,6 +121,16 @@ public class AttendanceRequestsController(
             ApiResponse<string>.SuccessResponse(
                 null,
                 "Attendance request cancelled successfully"));
-    }    
+    }
 
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _service.DeleteAsync(id);
+
+        return Ok(
+            ApiResponse<string>.SuccessResponse(
+                null,
+                "Attendance request deleted successfully"));
+    }
 }

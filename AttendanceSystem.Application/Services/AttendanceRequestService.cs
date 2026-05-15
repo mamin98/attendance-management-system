@@ -89,4 +89,19 @@ public class AttendanceRequestService(IUnitOfWork unitOfWork) : IAttendanceReque
         await _unitOfWork.SaveChangesAsync();
     }
 
+    public async Task DeleteAsync(Guid id)
+    {
+        AttendanceRequest? entity = await _unitOfWork.AttendanceRequestRepository
+            .GetByIdAsync(id);
+
+        if (entity is null)
+            throw new NotFoundException("Attendance request not found");
+
+        _unitOfWork.AttendanceRequestRepository.Delete(entity);
+
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+
+
 }

@@ -11,4 +11,5 @@ public interface IAttendanceRequestService
     Task CancelAsync(Guid id);
     Task ApproveAsync(Guid id);
     Task RejectAsync(Guid id);
+    Task DeleteAsync(Guid id);
 }
