@@ -24,4 +24,8 @@
     <ProjectReference Include="..\AttendanceSystem.Domain\AttendanceSystem.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\NewFolder\" />
+  </ItemGroup>
+
 </Project>

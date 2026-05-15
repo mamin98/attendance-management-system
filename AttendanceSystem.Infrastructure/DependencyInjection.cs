@@ -19,7 +19,8 @@ public static class DependencyInjection
         services.AddScoped<IAttendanceRequestRepository, AttendanceRequestRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAttendanceRequestService, AttendanceRequestService>();
-
+        services.AddScoped<DataSeeder>();
+        
         return services;
     }
     
