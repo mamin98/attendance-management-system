@@ -33,6 +33,8 @@ namespace AttendanceSystem.API
                 app.UseSwaggerUI();
             }
 
+            app.UseMiddleware<ExceptionMiddleware>(); // apply first
+            
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
