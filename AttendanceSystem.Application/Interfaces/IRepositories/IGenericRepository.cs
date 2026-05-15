@@ -7,9 +7,8 @@ public interface IGenericRepository<TEntity>
     Task<PagedResult<TEntity>> GetAllWithPaginationAsync(int page, int pageSize);
     Task<IReadOnlyList<TEntity>> GetAllAsync();
     Task<TEntity?> GetByIdAsync(Guid id);
+    Task<bool> IsExistAsync(Guid id);
     Task AddAsync(TEntity entity);
-
     void Update(TEntity entity);
-
     void Delete(TEntity entity);
 }

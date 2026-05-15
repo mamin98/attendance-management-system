@@ -38,6 +38,9 @@ public class GenericRepository<TEntity>
     public async Task<TEntity?> GetByIdAsync(Guid id)
         => await _context.Set<TEntity>().FindAsync(id);
 
+    public async Task<bool> IsExistAsync(Guid id)
+        => await _context.Set<TEntity>().AnyAsync(x => x.Id == id);
+
     public async Task AddAsync(TEntity entity)
         => await _context.Set<TEntity>().AddAsync(entity);
 

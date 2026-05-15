@@ -9,6 +9,16 @@ public class UnitOfWork : IUnitOfWork
 
     public UnitOfWork(AttendanceDbContext context) => _context = context;
     
+    private IGenericRepository<Employee>? _employeeRepository;
+    public IGenericRepository<Employee> EmployeeRepository
+    {
+        get
+        {
+            return _employeeRepository
+                ??= new GenericRepository<Employee>(_context);
+        }
+    }
+
     private IGenericRepository<Department>? _departmentRepository;
     public IGenericRepository<Department> DepartmentRepository
     {
@@ -17,17 +27,7 @@ public class UnitOfWork : IUnitOfWork
             return _departmentRepository
                 ??= new GenericRepository<Department>(_context);
         }
-    }
-
-    private IEmployeeRepository? _employeeRepository;
-    public IEmployeeRepository EmployeeRepository
-    {
-        get
-        {
-            return _employeeRepository
-                ??= new EmployeeRepository(_context);
-        }
-    }
+    }   
 
     private IAttendanceRequestRepository? _attendanceRequestRepository;
     public IAttendanceRequestRepository AttendanceRequestRepository
