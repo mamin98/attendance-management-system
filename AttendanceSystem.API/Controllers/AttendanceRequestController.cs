@@ -5,65 +5,122 @@ namespace AttendanceSystem.API;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AttendanceRequestsController : ControllerBase
+public class AttendanceRequestsController(
+    IAttendanceRequestService service) : ControllerBase
 {
-    private readonly IAttendanceRequestService _service;
+    readonly IAttendanceRequestService _service = service;
 
-    public AttendanceRequestsController(IAttendanceRequestService service) => _service = service;
-
-    [HttpGet]
-    public async Task<IActionResult> GetAllWithPagination(int page = 1, int pageSize = 10)
+    [HttpGet("paged")]
+    public async Task<IActionResult> GetAllWithPagination(
+        int page = 1,
+        int pageSize = 10)
     {
-        PagedResult<AttendanceRequestDto> result = await _service.GetAllWithPaginationAsync(page, pageSize);
-        return Ok(result);
+        PagedResult<AttendanceRequestDto> result =
+            await _service.GetAllWithPaginationAsync(page, pageSize);
+
+        if (result is null || result.TotalCount == 0)
+        {
+            return NotFound(
+                ApiResponse<string>.FailureResponse(
+                    "No attendance requests found"));
+        }
+
+        return Ok(
+            ApiResponse<PagedResult<AttendanceRequestDto>>
+            .SuccessResponse(result));
     }
 
+    [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        List<AttendanceRequestDto> result = await _service.GetAllAsync();
-        return Ok(result);
+        List<AttendanceRequestDto> result =
+            await _service.GetAllAsync();
+
+        if (result is null || result.Count == 0)
+        {
+            return NotFound(
+                ApiResponse<string>.FailureResponse(
+                    "No attendance requests found"));
+        }
+
+        return Ok(
+            ApiResponse<List<AttendanceRequestDto>>
+            .SuccessResponse(result));
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(Guid id)
     {
-        AttendanceRequestDto? result = await _service.GetByIdAsync(id);
-        return Ok(result);
+        AttendanceRequestDto? result =
+            await _service.GetByIdAsync(id);
+
+        if (result is null)
+        {
+            return NotFound(
+                ApiResponse<string>.FailureResponse(
+                    "Attendance request not found"));
+        }
+
+        return Ok(
+            ApiResponse<AttendanceRequestDto>
+            .SuccessResponse(result));
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateAttendanceRequestDto dto)
+    public async Task<IActionResult> Create(
+    [FromBody] CreateAttendanceRequestDto dto)
     {
         await _service.CreateAsync(dto);
-        return Ok("Created");
+
+        return Ok(
+            ApiResponse<string>.SuccessResponse(
+                null,
+                "Attendance request created successfully"));
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, UpdateAttendanceRequestDto dto)
+    public async Task<IActionResult> Update(
+    [FromBody] UpdateAttendanceRequestDto dto)
     {
-        await _service.UpdateAsync(id, dto);
-        return Ok("Updated");
+        await _service.UpdateAsync(dto.Id, dto);
+
+        return Ok(
+            ApiResponse<string>.SuccessResponse(
+                null,
+                "Attendance request updated successfully"));
     }
 
     [HttpPost("{id}/approve")]
     public async Task<IActionResult> Approve(Guid id)
     {
         await _service.ApproveAsync(id);
-        return Ok("Approved");
+
+        return Ok(
+            ApiResponse<string>.SuccessResponse(
+                null,
+                "Attendance request approved successfully"));
     }
 
     [HttpPost("{id}/reject")]
     public async Task<IActionResult> Reject(Guid id)
     {
         await _service.RejectAsync(id);
-        return Ok("Rejected");
+
+        return Ok(
+            ApiResponse<string>.SuccessResponse(
+                null,
+                "Attendance request rejected successfully"));
     }
 
     [HttpPost("{id}/cancel")]
     public async Task<IActionResult> Cancel(Guid id)
     {
         await _service.CancelAsync(id);
-        return Ok("Canceled");
 
-    }
+        return Ok(
+            ApiResponse<string>.SuccessResponse(
+                null,
+                "Attendance request cancelled successfully"));
+    }    
+
 }
