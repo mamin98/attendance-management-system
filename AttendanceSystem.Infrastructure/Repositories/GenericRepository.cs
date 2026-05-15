@@ -14,7 +14,7 @@ public class GenericRepository<TEntity>
 
     public async Task<PagedResult<TEntity>> GetAllWithPaginationAsync(int page, int pageSize)
     {
-        IQueryable<TEntity> query = _context.Set<TEntity>().AsQueryable();
+        IQueryable<TEntity> query = _context.Set<TEntity>().Where(x => !x.IsDeleted).AsQueryable();
 
         int totalCount = await query.CountAsync();
 
@@ -33,7 +33,7 @@ public class GenericRepository<TEntity>
     }
 
     public async Task<IReadOnlyList<TEntity>> GetAllAsync()
-        => await _context.Set<TEntity>().ToListAsync();
+        => await _context.Set<TEntity>().Where(x => !x.IsDeleted).ToListAsync();
 
     public async Task<TEntity?> GetByIdAsync(Guid id)
         => await _context.Set<TEntity>().FindAsync(id);

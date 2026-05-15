@@ -29,9 +29,10 @@ public class CreateAttendanceRequestDto : AttendanceRequestBaseDto
 
 public class UpdateAttendanceRequestDto : AttendanceRequestBaseDto
 {    
+   public Guid Id { get; set; }
    public RequestType RequestType { get; set; }
 
-   public AttendanceRequest UpdateEntity(AttendanceRequest request)
+    public AttendanceRequest UpdateEntity(AttendanceRequest request)
    {        
         return request.Update(
             RequestType,
