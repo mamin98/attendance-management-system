@@ -10,12 +10,9 @@ public class GenericRepository<TEntity>
 {
     protected readonly AttendanceDbContext _context;
 
-    public GenericRepository(AttendanceDbContext context)
-    {
-        _context = context;
-    }
-    
-    public async Task<PagedResult<TEntity>> GetPagedAsync(int page, int pageSize)
+    public GenericRepository(AttendanceDbContext context) => _context = context;
+
+    public async Task<PagedResult<TEntity>> GetAllWithPaginationAsync(int page, int pageSize)
     {
         IQueryable<TEntity> query = _context.Set<TEntity>().AsQueryable();
 

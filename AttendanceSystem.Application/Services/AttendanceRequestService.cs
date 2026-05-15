@@ -6,8 +6,8 @@ public class AttendanceRequestService(
     IAttendanceRequestRepository repository,
     IUnitOfWork unitOfWork) : IAttendanceRequestService
 {
-    private readonly IAttendanceRequestRepository _repository = repository;
-    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    readonly IAttendanceRequestRepository _repository = repository;
+    readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     
     public async Task<PagedResult<AttendanceRequestDto>> GetAllWithPaginationAsync(

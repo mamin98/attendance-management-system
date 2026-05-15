@@ -98,10 +98,10 @@ public class AttendanceRequest : BaseEntity
         string? reason)
     {
         SetEmployeeId(employeeId)
-            .SetRequestType(type)
-            .SetDate(date)
-            .SetTime(from, to)
-            .SetReason(reason ?? string.Empty);
+        .SetRequestType(type)
+        .SetDate(date)
+        .SetTime(from, to)
+        .SetReason(reason ?? string.Empty);
 
         return this;
     }
