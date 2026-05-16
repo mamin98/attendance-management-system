@@ -10,6 +10,8 @@ public class AttendanceRequestRepository(AttendanceDbContext context)
     public async Task<IReadOnlyList<AttendanceRequest>> GetEmployeeRequestsAsync(Guid employeeId)
     {
         return await _context.AttendanceRequests
+            .AsNoTracking()
+            .Include(x => x.Employee)
             .Where(x => x.EmployeeId == employeeId)
             .ToListAsync();
     }
