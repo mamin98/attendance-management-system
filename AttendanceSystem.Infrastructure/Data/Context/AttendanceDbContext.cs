@@ -186,4 +186,40 @@ public class AttendanceDbContext : DbContext
             .HasForeignKey(x => x.DepartmentId)
             .OnDelete(DeleteBehavior.Cascade);
     }
+
+    public override async Task<int> SaveChangesAsync(
+    CancellationToken cancellationToken = default)
+    {
+        ApplyAuditInformation();
+
+        return await base.SaveChangesAsync(cancellationToken);
+    }
+
+    private void ApplyAuditInformation()
+    {
+        IEnumerable<EntityEntry<BaseEntity>> entries =
+            ChangeTracker
+                .Entries<BaseEntity>();
+
+        foreach (EntityEntry<BaseEntity> entry in entries)
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedAt = DateTime.UtcNow;
+
+                entry.Entity.CreatedBy = "System";
+            }
+
+            if (entry.State == EntityState.Modified)
+            {
+                entry.Property(x => x.CreatedAt).IsModified = false;
+
+                entry.Property(x => x.CreatedBy).IsModified = false;
+
+                entry.Entity.LastModifiedAt = DateTime.UtcNow;
+
+                entry.Entity.LastModifiedBy = "System";
+            }
+        }
+    }
 }

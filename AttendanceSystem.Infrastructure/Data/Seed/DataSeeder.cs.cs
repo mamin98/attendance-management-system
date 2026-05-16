@@ -14,143 +14,103 @@ public class DataSeeder
         if (await _context.Employees.AnyAsync())
             return;
 
-        Guid hrManagerId = Guid.NewGuid();
-        Guid itManagerId = Guid.NewGuid();
-        Guid finManagerId = Guid.NewGuid();
-
+        
+        // IDs
+        
         Guid hrDeptId = Guid.NewGuid();
         Guid itDeptId = Guid.NewGuid();
         Guid finDeptId = Guid.NewGuid();
 
-        Guid emp1 = Guid.NewGuid();
-        Guid emp2 = Guid.NewGuid();
-        Guid emp3 = Guid.NewGuid();
+        Guid hrManagerId = Guid.NewGuid();
+        Guid itManagerId = Guid.NewGuid();
+        Guid finManagerId = Guid.NewGuid();
 
-        Guid att1 = Guid.NewGuid();
-        Guid att2 = Guid.NewGuid();
+        Guid emp1Id = Guid.NewGuid();
+        Guid emp2Id = Guid.NewGuid();
+        Guid emp3Id = Guid.NewGuid();
 
-        
-        Employee hrManager = Employee.Create(
-            hrDeptId,
-            EmployeeRole.Manager,
-            "Sara Ahmed",
-            "سارة أحمد",
-            "sara.hr@company.com");
-
-        hrManager.SetId(hrManagerId);
-
-        Employee itManager = Employee.Create(
-            itDeptId,
-            EmployeeRole.Manager,
-            "Omar Khaled",
-            "عمر خالد",
-            "omar.it@company.com");
-
-        itManager.SetId(itManagerId);
-
-        Employee finManager = Employee.Create(
-            finDeptId,
-            EmployeeRole.Manager,
-            "Mona Hassan",
-            "منى حسن",
-            "mona.finance@company.com");
-
-        finManager.SetId(finManagerId);
-
-        Employee employee1 = Employee.Create(
-            itDeptId,
-            EmployeeRole.Employee,
-            "Ali Mohamed",
-            "علي محمد",
-            "ali.m@company.com");
-
-        employee1.SetId(emp1);
-
-        Employee employee2 = Employee.Create(
-            itDeptId,
-            EmployeeRole.Employee,
-            "Youssef Tarek",
-            "يوسف طارق",
-            "youssef.t@company.com");
-
-        employee2.SetId(emp2);
-        
-
-        Employee employee3 = Employee.Create(
-            hrDeptId,
-            EmployeeRole.Employee,
-            "Nour Samir",
-            "نور سمير",
-            "nour.s@company.com");
-
-        employee3.SetId(emp3);
-
-        Employee admin = Employee.Create(
-            itDeptId,
-            EmployeeRole.Admin,
-            "System Admin",
-            "مسؤول النظام",
-            "admin@company.com");
-
-        admin.SetId(Guid.NewGuid());
-
-
-        Department hrDept = Department.Create(
-            hrManagerId,
-            "Human Resources",
-            "الموارد البشرية");
-
+                
+        Department hrDept = Department.Create(null, "HR", "الموارد");
         hrDept.SetId(hrDeptId);
 
-        Department itDept = Department.Create(
-            itManagerId,
-            "Information Technology",
-            "تكنولوجيا المعلومات");
-
+        Department itDept = Department.Create(null, "IT", "تكنولوجيا المعلومات");
         itDept.SetId(itDeptId);
 
-        Department finDept = Department.Create(
-            finManagerId,
-            "Finance",
-            "المالية");
-
+        Department finDept = Department.Create(null, "Finance", "المالية");
         finDept.SetId(finDeptId);
 
-        AttendanceRequest attRequest1 = AttendanceRequest.Create(
-            emp1,
+        await _context.Departments.AddRangeAsync(hrDept, itDept, finDept);
+        await _context.SaveChangesAsync();
+        
+        
+        Employee hrManager = Employee.Create(EmployeeRole.Manager, "Sara", "سارة", "hr@c.com");
+        hrManager.SetId(hrManagerId);
+
+        Employee itManager = Employee.Create(EmployeeRole.Manager, "Omar", "عمر", "it@c.com");
+        itManager.SetId(itManagerId);
+
+        Employee finManager = Employee.Create(EmployeeRole.Manager, "Mona", "منى", "fin@c.com");
+        finManager.SetId(finManagerId);
+
+        await _context.Employees.AddRangeAsync(hrManager, itManager, finManager);
+        await _context.SaveChangesAsync();
+
+                
+        hrDept.SetManagerId(hrManager.Id);
+        itDept.SetManagerId(itManager.Id);
+        finDept.SetManagerId(finManager.Id);
+
+        _context.Departments.UpdateRange(hrDept, itDept, finDept);
+        await _context.SaveChangesAsync();
+
+                
+        Employee emp1 = Employee.Create(EmployeeRole.Employee, "Ali", "علي", "a@c.com");
+        emp1.SetId(emp1Id);
+
+        Employee emp2 = Employee.Create(EmployeeRole.Employee, "Youssef", "يوسف", "y@c.com");
+        emp2.SetId(emp2Id);
+
+        Employee emp3 = Employee.Create(EmployeeRole.Employee, "Nour", "نور", "n@c.com");
+        emp3.SetId(emp3Id);
+
+        Employee admin = Employee.Create(EmployeeRole.Admin, "Admin", "مدير النظام", "admin@c.com");
+        admin.SetId(Guid.NewGuid());
+
+        await _context.Employees.AddRangeAsync(emp1, emp2, emp3, admin);
+        await _context.SaveChangesAsync();
+
+                
+        await _context.Set<EmployeeDepartment>().AddRangeAsync(
+            EmployeeDepartment.Create(emp1.Id, itDept.Id),
+            EmployeeDepartment.Create(emp2.Id, itDept.Id),
+            EmployeeDepartment.Create(emp3.Id, hrDept.Id),
+            EmployeeDepartment.Create(admin.Id, finDept.Id)
+        );
+
+        await _context.SaveChangesAsync();
+
+                
+        AttendanceRequest att1 = AttendanceRequest.Create(
+            emp1.Id,
             RequestType.Late,
             DateTime.UtcNow.Date,
             new TimeSpan(9, 0, 0),
             new TimeSpan(10, 0, 0),
-            "Traffic delay");
+            "Traffic"
+        );
 
-        attRequest1.SetId(att1);
-
-        AttendanceRequest attRequest2 = AttendanceRequest.Create(
-            emp2,
+        AttendanceRequest att2 = AttendanceRequest.Create(
+            emp2.Id,
             RequestType.Remote,
             DateTime.UtcNow.Date.AddDays(-1),
             null,
             null,
-            "Working from home");
-
-        attRequest2.SetId(att2);
-        attRequest2.Approve(); 
-
-        await _context.Employees.AddRangeAsync(
-            admin,
-            hrManager, itManager, finManager,
-            employee1, employee2, employee3
+            "WFH"
         );
 
-        await _context.Departments.AddRangeAsync(
-            hrDept, itDept, finDept
-        );
+        att2.Approve();
 
-        await _context.AttendanceRequests.AddRangeAsync(
-            attRequest1, attRequest2
-        );
-
+        await _context.AttendanceRequests.AddRangeAsync(att1, att2);
         await _context.SaveChangesAsync();
     }
 }
