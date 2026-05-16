@@ -4,12 +4,11 @@ public class Department : BaseEntity
 {
     public string NameEnglish { get; private set; } = string.Empty;
     public string NameArabic { get; private set; } = string.Empty;
-    public Guid ManagerId { get; private set; }
+    public Guid? ManagerId { get; private set; }
     public virtual Employee? Manager { get; private set; }
+    public virtual ICollection<EmployeeDepartment> EmployeeDepartments { get; private set; } = [];
 
-    public virtual ICollection<Employee> Employees { get; private set; } = [];
-
-    private Department SetManagerId(Guid managerId)
+    public Department SetManagerId(Guid? managerId)
     {
         ManagerId = managerId;
         return this;
@@ -28,20 +27,20 @@ public class Department : BaseEntity
     }
 
     public static Department Create(
-    Guid managerId,
+    Guid? managerId,
     string nameEn,
     string nameAr)
     => new Department()
             .ApplyData(managerId, nameEn, nameAr);
 
     public Department Update(
-        Guid managerId,
+        Guid? managerId,
         string nameEn,
         string nameAr)
         => ApplyData(managerId, nameEn, nameAr);
     
     private Department ApplyData(
-        Guid managerId,
+        Guid? managerId,
         string nameEn,
         string nameAr)
     {

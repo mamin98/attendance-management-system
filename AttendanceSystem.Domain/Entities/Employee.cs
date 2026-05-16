@@ -5,18 +5,11 @@ public class Employee : BaseEntity
     public string NameEnglish { get; private set; } = string.Empty;
     public string NameArabic { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
-    public Guid DepartmentId { get; private set; }
     public EmployeeRole Role { get; private set; }
     
-    public virtual Department? Department { get; private set; }
+    public virtual ICollection<EmployeeDepartment> EmployeeDepartments { get; private set; } = [];
     public virtual ICollection<AttendanceRequest> AttendanceRequests { get; private set; } = [];
     public virtual ICollection<Department> DepartmentManagers { get; private set; } = [];
-
-    private Employee SetDepartmentId(Guid departmentId)
-    {
-        DepartmentId = departmentId;
-        return this;
-    }
 
     private Employee SetNameEnglish(string name)
     {
@@ -44,32 +37,28 @@ public class Employee : BaseEntity
     }
    
     public static Employee Create(
-        Guid departmentId,
         EmployeeRole role,
         string nameEn,
         string nameAr,
         string email)
         => new Employee()
-            .ApplyData(departmentId, role, nameEn, nameAr, email);
+            .ApplyData(role, nameEn, nameAr, email);
 
     public Employee Update(
-        Guid departmentId,
         EmployeeRole role,
         string nameEn,
         string nameAr,
         string email)
-        => ApplyData(departmentId, role, nameEn, nameAr, email);
+        => ApplyData(role, nameEn, nameAr, email);
     
 
     private Employee ApplyData(
-        Guid departmentId,
         EmployeeRole role,
         string nameEn,
         string nameAr,
         string email)
     {
-        SetDepartmentId(departmentId)
-        .SetRole(role)
+        SetRole(role)
         .SetNameEnglish(nameEn)
         .SetNameArabic(nameAr)
         .SetEmail(email);

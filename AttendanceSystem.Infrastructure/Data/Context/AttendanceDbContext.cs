@@ -1,5 +1,6 @@
 using AttendanceSystem.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Reflection;
 
 namespace AttendanceSystem.Infrastructure;
@@ -15,6 +16,7 @@ public class AttendanceDbContext : DbContext
     public DbSet<AttendanceRequest> AttendanceRequests { get; set; }
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Department> Departments { get; set; }
+    public DbSet<EmployeeDepartment> EmployeeDepartments { get; set; }
 
     // Model Configurations    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -110,9 +112,6 @@ public class AttendanceDbContext : DbContext
 
         modelBuilder.Entity<Employee>(entity =>
         {
-            entity.Property(x => x.DepartmentId)
-                .IsRequired();
-
             entity.Property(x => x.Role)
                 .HasConversion<int>()
                 .IsRequired();
@@ -133,19 +132,28 @@ public class AttendanceDbContext : DbContext
                 .IsUnique();
         });
 
-         modelBuilder.Entity<Department>(entity =>
-        {
-            entity.Property(x => x.ManagerId)
-                .IsRequired();         
+        modelBuilder.Entity<Department>(entity =>
+       {
+           entity.Property(x => x.ManagerId)
+               .IsRequired(false);
 
-            entity.Property(x => x.NameEnglish)
-                .HasMaxLength(200)
-                .IsRequired();
+           entity.Property(x => x.NameEnglish)
+               .HasMaxLength(200)
+               .IsRequired();
 
-            entity.Property(x => x.NameArabic)
-                .HasMaxLength(200)
-                .IsRequired();         
-        });
+           entity.Property(x => x.NameArabic)
+               .HasMaxLength(200)
+               .IsRequired();
+       });
+
+         modelBuilder.Entity<EmployeeDepartment>(entity =>
+       {
+           entity.Property(x => x.EmployeeId)
+               .IsRequired(false);
+
+            entity.Property(x => x.DepartmentId)
+               .IsRequired(false);           
+       });
     }
 
     // Relationships    
@@ -163,11 +171,19 @@ public class AttendanceDbContext : DbContext
             .HasForeignKey(d => d.ManagerId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<Employee>()
-            .HasOne(x => x.Department)
-            .WithMany(x => x.Employees)
-            .HasForeignKey(x => x.DepartmentId)
-            .OnDelete(DeleteBehavior.Restrict);
-    }
+        modelBuilder.Entity<EmployeeDepartment>()
+            .HasKey(x => new { x.EmployeeId, x.DepartmentId });
 
+        modelBuilder.Entity<EmployeeDepartment>()
+            .HasOne(x => x.Employee)
+            .WithMany(e => e.EmployeeDepartments)
+            .HasForeignKey(x => x.EmployeeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EmployeeDepartment>()
+            .HasOne(x => x.Department)
+            .WithMany(d => d.EmployeeDepartments)
+            .HasForeignKey(x => x.DepartmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
 }
