@@ -1,8 +1,10 @@
 using AttendanceSystem.Application;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AttendanceSystem.API;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class AttendanceRequestsController(
@@ -90,6 +92,7 @@ public class AttendanceRequestsController(
                 "Attendance request updated successfully"));
     }
 
+    [Authorize(Roles = "Admin, Manager")]
     [HttpPost("{id}/approve")]
     public async Task<IActionResult> Approve(Guid id)
     {
@@ -101,6 +104,7 @@ public class AttendanceRequestsController(
                 "Attendance request approved successfully"));
     }
 
+    [Authorize(Roles = "Admin, Manager")]
     [HttpPost("{id}/reject")]
     public async Task<IActionResult> Reject(Guid id)
     {
