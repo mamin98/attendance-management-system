@@ -1,3 +1,4 @@
+using AttendanceSystem.Application;
 using AttendanceSystem.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -7,9 +8,12 @@ namespace AttendanceSystem.Infrastructure;
 
 public class AttendanceDbContext : DbContext
 {
-    public AttendanceDbContext(DbContextOptions<AttendanceDbContext> options)
-        : base(options)
+    private readonly ICurrentUserService _currentUserService;
+    public AttendanceDbContext(DbContextOptions<AttendanceDbContext> options,
+    ICurrentUserService currentUserService)
+    : base(options)
     {
+        _currentUserService = currentUserService;
     }
 
     // DbSets    
@@ -197,28 +201,26 @@ public class AttendanceDbContext : DbContext
 
     private void ApplyAuditInformation()
     {
-        IEnumerable<EntityEntry<BaseEntity>> entries =
-            ChangeTracker
-                .Entries<BaseEntity>();
+        var entries = ChangeTracker
+            .Entries<BaseEntity>();
 
-        foreach (EntityEntry<BaseEntity> entry in entries)
+        foreach (var entry in entries)
         {
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.CreatedAt = DateTime.UtcNow;
 
-                entry.Entity.CreatedBy = "System";
+                entry.Entity.CreatedBy =
+                    _currentUserService.UserEmail;
             }
 
             if (entry.State == EntityState.Modified)
             {
-                entry.Property(x => x.CreatedAt).IsModified = false;
+                entry.Entity.LastModifiedAt =
+                    DateTime.UtcNow;
 
-                entry.Property(x => x.CreatedBy).IsModified = false;
-
-                entry.Entity.LastModifiedAt = DateTime.UtcNow;
-
-                entry.Entity.LastModifiedBy = "System";
+                entry.Entity.LastModifiedBy =
+                    _currentUserService.UserEmail;
             }
         }
     }
