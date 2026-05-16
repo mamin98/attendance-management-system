@@ -18,16 +18,16 @@ public class JwtTokenGenerator(
     {
         IConfiguration jwtSettings = _configuration.GetSection("Jwt");
 
-        SymmetricSecurityKey key = new SymmetricSecurityKey(
+        SymmetricSecurityKey key = new(
             Encoding.UTF8.GetBytes(jwtSettings["Key"]!));
 
-        SigningCredentials credentials = new SigningCredentials(
+        SigningCredentials credentials = new(
             key,
             SecurityAlgorithms.HmacSha256);
 
         Claim[] claims =
         [
-            new Claim(JwtRegisteredClaimNames.Sub, employee.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, employee.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, employee.Email),
             new Claim(ClaimTypes.Role, employee.Role.ToString()),
             new Claim(ClaimTypes.Name, employee.NameEnglish)
