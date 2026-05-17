@@ -7,10 +7,9 @@ public class AttendanceRequestService(IUnitOfWork unitOfWork) : IAttendanceReque
     readonly IUnitOfWork _unitOfWork = unitOfWork;
     
     public async Task<PagedResult<AttendanceRequestDto>> GetAllWithPaginationAsync(
-    int page,
-    int pageSize)
+    AttendanceRequestSearchDto searchDto)
     {
-        PagedResult<AttendanceRequest> data = await _unitOfWork.AttendanceRequestRepository.GetAllWithPaginationAsync(page, pageSize);
+        PagedResult<AttendanceRequest> data = await _unitOfWork.AttendanceRequestRepository.GetAllWithPaginationAsync(searchDto);
 
         return new PagedResult<AttendanceRequestDto>
         {

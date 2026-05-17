@@ -1,9 +1,8 @@
 namespace AttendanceSystem.Application;
 
 public interface IAttendanceRequestService
-{
-    
-    Task<PagedResult<AttendanceRequestDto>> GetAllWithPaginationAsync(int page, int pageSize);
+{    
+    Task<PagedResult<AttendanceRequestDto>> GetAllWithPaginationAsync(AttendanceRequestSearchDto search);
     Task<List<AttendanceRequestDto>> GetAllAsync();
     Task<AttendanceRequestDto?> GetByIdAsync(Guid id);
     Task CreateAsync(CreateAttendanceRequestDto dto);

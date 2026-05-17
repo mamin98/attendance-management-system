@@ -14,11 +14,10 @@ public class AttendanceRequestsController(
 
     [HttpGet("paged")]
     public async Task<IActionResult> GetAllWithPagination(
-        int page = 1,
-        int pageSize = 10)
+    [FromQuery] AttendanceRequestSearchDto search)
     {
         PagedResult<AttendanceRequestDto> result =
-            await _service.GetAllWithPaginationAsync(page, pageSize);
+            await _service.GetAllWithPaginationAsync(search);
 
         if (result is null || result.TotalCount == 0)
         {
@@ -31,7 +30,7 @@ public class AttendanceRequestsController(
             ApiResponse<PagedResult<AttendanceRequestDto>>
             .SuccessResponse(result));
     }
-
+    
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {

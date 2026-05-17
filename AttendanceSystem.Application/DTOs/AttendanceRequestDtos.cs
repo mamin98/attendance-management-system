@@ -51,3 +51,13 @@ public class AttendanceRequestBaseDto
     public TimeSpan? ToTime { get; set; }
     public string? Reason { get; set; }
 }
+
+
+public class AttendanceRequestSearchDto : SearchDto
+{
+    public Guid? EmployeeId { get; set; }
+    public RequestType? RequestType { get; set; }
+    public RequestStatus? RequestStatus { get; set; }
+    public DateTime? FromDate { get; set; }
+    public DateTime? ToDate { get; set; }
+}
