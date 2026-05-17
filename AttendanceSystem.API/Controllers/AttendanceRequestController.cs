@@ -67,6 +67,24 @@ public class AttendanceRequestsController(
             .SuccessResponse(result));
     }
 
+    [HttpGet("employee/{employeeId}")]
+    public async Task<IActionResult> GetEmployeeRequests(Guid employeeId)
+    {
+        List<AttendanceRequestDto> result =
+            await _service.GetEmployeeRequestsAsync(employeeId);
+
+        if (result is null || result.Count == 0)
+        {
+            return NotFound(
+                ApiResponse<string>.FailureResponse(
+                    "No attendance requests found for this employee"));
+        }
+
+        return Ok(
+            ApiResponse<List<AttendanceRequestDto>>
+            .SuccessResponse(result));
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create(
     [FromBody] CreateAttendanceRequestDto dto)

@@ -33,6 +33,14 @@ public class AttendanceRequestService(IUnitOfWork unitOfWork) : IAttendanceReque
         return entity?.ToDto();
     }
 
+     public async Task<List<AttendanceRequestDto>> GetEmployeeRequestsAsync(Guid employeeId)
+    {
+        IReadOnlyList<AttendanceRequest> employeeRequests = await _unitOfWork.AttendanceRequestRepository
+            .GetEmployeeRequestsAsync(employeeId);
+
+        return [.. employeeRequests.Select(x => x.ToDto())];
+    }
+
     public async Task CreateAsync(CreateAttendanceRequestDto dto)
     {
         bool employeeIsExist = await _unitOfWork.EmployeeRepository.IsExistAsync(dto.EmployeeId);
