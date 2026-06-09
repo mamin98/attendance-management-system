@@ -39,6 +39,16 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private IRefreshTokenRepository? _refreshTokenRepository;
+    public IRefreshTokenRepository RefreshTokenRepository
+    {
+        get
+        {
+            return _refreshTokenRepository
+                ??= new RefreshTokenRepository(_context);
+        }
+    }
+
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     => await _context.SaveChangesAsync(cancellationToken);    
