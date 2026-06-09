@@ -22,3 +22,12 @@ public enum EmployeeRole
     Manager,
     Admin
 }
+
+
+public enum RefreshTokenExpiry
+{
+    SevenDays    = 7,
+    FifteenDays  = 15,
+    ThirtyDays   = 30,
+    NinetyDays   = 90
+}
