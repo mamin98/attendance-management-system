@@ -45,11 +45,13 @@ public static class DependencyInjection
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IAttendanceRequestRepository, AttendanceRequestRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IAttendanceRequestService, AttendanceRequestService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<DataSeeder>();
         services.AddHttpContextAccessor();
 
