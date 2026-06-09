@@ -21,19 +21,20 @@ public class AttendanceDbContext : DbContext
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Department> Departments { get; set; }
     public DbSet<EmployeeDepartment> EmployeeDepartments { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
     // Model Configurations    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(AttendanceDbContext).Assembly);
+
         ConfigureBaseEntity(modelBuilder);
 
         ApplyGlobalFilters(modelBuilder);
 
-        ConfigureEntities(modelBuilder);
-
-        ConfigureRelationships(modelBuilder);
     }
 
     // Base Entity Configuration    
@@ -85,110 +86,6 @@ public class AttendanceDbContext : DbContext
     {
         builder.Entity<TEntity>()
             .HasQueryFilter(x => !x.IsDeleted);
-    }
-
-    // Entity Configurations    
-    private static void ConfigureEntities(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<AttendanceRequest>(entity =>
-        {
-            entity.Property(x => x.RequestType)
-                .HasConversion<int>()
-                .IsRequired();
-
-            entity.Property(x => x.RequestStatus)
-                .HasConversion<int>()
-                .IsRequired();
-
-            entity.Property(x => x.RequestDate)
-                .IsRequired();
-
-            entity.Property(x => x.EmployeeId)
-                .IsRequired();
-
-            entity.Property(x => x.Reason)
-                .HasMaxLength(500);
-
-            entity.Property(x => x.FromTime);
-
-            entity.Property(x => x.ToTime);
-        });
-
-        modelBuilder.Entity<Employee>(entity =>
-        {
-            entity.Property(x => x.Role)
-                .HasConversion<int>()
-                .IsRequired();
-
-            entity.Property(x => x.NameEnglish)
-                .HasMaxLength(200)
-                .IsRequired();
-
-            entity.Property(x => x.NameArabic)
-                .HasMaxLength(200)
-                .IsRequired();
-
-            entity.Property(x => x.Email)
-                .HasMaxLength(200)
-                .IsRequired();
-
-            entity.HasIndex(x => x.Email)
-                .IsUnique();
-        });
-
-        modelBuilder.Entity<Department>(entity =>
-       {
-           entity.Property(x => x.ManagerId)
-               .IsRequired(false);
-
-           entity.Property(x => x.NameEnglish)
-               .HasMaxLength(200)
-               .IsRequired();
-
-           entity.Property(x => x.NameArabic)
-               .HasMaxLength(200)
-               .IsRequired();
-       });
-
-         modelBuilder.Entity<EmployeeDepartment>(entity =>
-       {
-           entity.Property(x => x.EmployeeId)
-               .IsRequired(false);
-
-            entity.Property(x => x.DepartmentId)
-               .IsRequired(false);           
-       });
-    }
-
-    // Relationships    
-    private static void ConfigureRelationships(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<AttendanceRequest>()
-            .HasOne(x => x.Employee)
-            .WithMany(x => x.AttendanceRequests)
-            .HasForeignKey(x => x.EmployeeId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Department>()
-            .HasOne(d => d.Manager)
-            .WithMany(e => e.DepartmentManagers)
-            .HasForeignKey(d => d.ManagerId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<EmployeeDepartment>()
-            .HasKey(x => new { x.EmployeeId, x.DepartmentId });
-
-        modelBuilder.Entity<EmployeeDepartment>()
-            .HasOne(x => x.Employee)
-            .WithMany(e => e.EmployeeDepartments)
-            .HasForeignKey(x => x.EmployeeId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<EmployeeDepartment>()
-            .HasOne(x => x.Department)
-            .WithMany(d => d.EmployeeDepartments)
-            .HasForeignKey(x => x.DepartmentId)
-            .OnDelete(DeleteBehavior.Cascade);
     }
 
     public override async Task<int> SaveChangesAsync(
