@@ -1,3 +1,5 @@
+using BCrypt.Net;
+
 namespace AttendanceSystem.Domain;
 
 public class Employee : BaseEntity
@@ -5,12 +7,13 @@ public class Employee : BaseEntity
     public string NameEnglish { get; private set; } = string.Empty;
     public string NameArabic { get; private set; } = string.Empty;
     public string Email { get; private set; } = string.Empty;
+    public string PasswordHash { get; private set; } = string.Empty;
     public EmployeeRole Role { get; private set; }
-    
+
     public virtual ICollection<EmployeeDepartment> EmployeeDepartments { get; private set; } = [];
     public virtual ICollection<AttendanceRequest> AttendanceRequests { get; private set; } = [];
     public virtual ICollection<Department> DepartmentManagers { get; private set; } = [];
-
+    public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = [];
     private Employee SetNameEnglish(string name)
     {
         NameEnglish = name.Trim();
@@ -30,19 +33,41 @@ public class Employee : BaseEntity
         return this;
     }
 
+    public bool VerifyPassword(string plainPassword)
+        => BCrypt.Net.BCrypt.Verify(plainPassword, PasswordHash);
+
+    public void UpdatePassword(string newPlainPassword)
+        => SetPasswordHash(BCrypt.Net.BCrypt.HashPassword(newPlainPassword));
+    private Employee SetPasswordHash(string passwordHash)
+    {
+        PasswordHash = passwordHash;
+        return this;
+    }
+
+    public Employee ChangePassword(
+        string passwordHash)
+    {
+        return SetPasswordHash(passwordHash);
+    }
+
     private Employee SetRole(EmployeeRole role)
     {
         Role = role;
         return this;
     }
-   
+
     public static Employee Create(
         EmployeeRole role,
         string nameEn,
         string nameAr,
-        string email)
-        => new Employee()
-            .ApplyData(role, nameEn, nameAr, email);
+        string email,
+        string passwordHash)
+    {
+        return new Employee()
+           .ApplyData(role, nameEn, nameAr, email)
+           .SetPasswordHash(BCrypt.Net.BCrypt.HashPassword(passwordHash));
+
+    }
 
     public Employee Update(
         EmployeeRole role,
@@ -50,7 +75,7 @@ public class Employee : BaseEntity
         string nameAr,
         string email)
         => ApplyData(role, nameEn, nameAr, email);
-    
+
 
     private Employee ApplyData(
         EmployeeRole role,

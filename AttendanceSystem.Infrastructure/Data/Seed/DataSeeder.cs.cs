@@ -43,13 +43,13 @@ public class DataSeeder
         await _context.SaveChangesAsync();
         
         
-        Employee hrManager = Employee.Create(EmployeeRole.Manager, "Sara", "سارة", "hr@c.com");
+        Employee hrManager = Employee.Create(EmployeeRole.Manager, "Sara", "سارة", "hr@c.com", "Manager@1234");
         hrManager.SetId(hrManagerId);
 
-        Employee itManager = Employee.Create(EmployeeRole.Manager, "Omar", "عمر", "it@c.com");
+        Employee itManager = Employee.Create(EmployeeRole.Manager, "Omar", "عمر", "it@c.com", "Manager@1234");
         itManager.SetId(itManagerId);
 
-        Employee finManager = Employee.Create(EmployeeRole.Manager, "Mona", "منى", "fin@c.com");
+        Employee finManager = Employee.Create(EmployeeRole.Manager, "Mona", "منى", "fin@c.com", "Manager@1234");
         finManager.SetId(finManagerId);
 
         await _context.Employees.AddRangeAsync(hrManager, itManager, finManager);
@@ -64,16 +64,16 @@ public class DataSeeder
         await _context.SaveChangesAsync();
 
                 
-        Employee emp1 = Employee.Create(EmployeeRole.Employee, "Ali", "علي", "a@c.com");
+        Employee emp1 = Employee.Create(EmployeeRole.Employee, "Ali", "علي", "a@c.com", "Employee@1234");
         emp1.SetId(emp1Id);
 
-        Employee emp2 = Employee.Create(EmployeeRole.Employee, "Youssef", "يوسف", "y@c.com");
+        Employee emp2 = Employee.Create(EmployeeRole.Employee, "Youssef", "يوسف", "y@c.com", "Employee@1234");
         emp2.SetId(emp2Id);
 
-        Employee emp3 = Employee.Create(EmployeeRole.Employee, "Nour", "نور", "n@c.com");
+        Employee emp3 = Employee.Create(EmployeeRole.Employee, "Nour", "نور", "n@c.com", "Employee@1234");
         emp3.SetId(emp3Id);
 
-        Employee admin = Employee.Create(EmployeeRole.Admin, "Admin", "مدير النظام", "admin@c.com");
+        Employee admin = Employee.Create(EmployeeRole.Admin, "Admin", "مدير النظام", "admin@c.com", "Admin@1234");
         admin.SetId(Guid.NewGuid());
 
         await _context.Employees.AddRangeAsync(emp1, emp2, emp3, admin);
