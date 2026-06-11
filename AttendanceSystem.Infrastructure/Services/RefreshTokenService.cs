@@ -36,5 +36,6 @@ public class RefreshTokenService(IUnitOfWork unitOfWork)
        
         existing.Revoke();
         _unitOfWork.RefreshTokenRepository.Update(existing);
+        await _unitOfWork.SaveChangesAsync();
     }
 }

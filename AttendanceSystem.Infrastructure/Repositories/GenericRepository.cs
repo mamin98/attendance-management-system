@@ -35,8 +35,8 @@ public class GenericRepository<TEntity>
     public async Task<IReadOnlyList<TEntity>> GetAllAsync()
         => await _context.Set<TEntity>().AsNoTracking().ToListAsync();
 
-    public async Task<TEntity?> GetByIdAsync(Guid id)
-        => await _context.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+    public virtual async Task<TEntity?> GetByIdAsync(Guid id)
+        => await _context.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == id);
 
     public async Task<bool> IsExistAsync(Guid id)
         => await _context.Set<TEntity>().AsNoTracking().AnyAsync(x => x.Id == id);
@@ -48,5 +48,9 @@ public class GenericRepository<TEntity>
         => _context.Set<TEntity>().Update(entity);
 
     public void Delete(TEntity entity)
-        => entity.SoftDelete();
+    {
+        entity.SoftDelete();
+        _context.Set<TEntity>().Update(entity);
+
+    } 
 }
