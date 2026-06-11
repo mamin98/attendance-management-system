@@ -15,11 +15,7 @@ public class AuthService(
     public async Task<LoginResponseDto> LoginAsync(
         LoginRequestDto dto)
     {
-        Employee? employee = (await _unitOfWork
-            .EmployeeRepository
-            .GetAllAsync())
-            .FirstOrDefault(x =>
-                x.Email.ToLower() == dto.Email.ToLower());
+        Employee? employee = await _unitOfWork.EmployeeRepository.GetByEmailAsync(dto.Email);
 
         if (employee is null || !employee.VerifyPassword(dto.Password))
             throw new UnauthorizedException("Invalid credentials");
