@@ -9,13 +9,13 @@ public class UnitOfWork : IUnitOfWork
 
     public UnitOfWork(AttendanceDbContext context) => _context = context;
     
-    private IGenericRepository<Employee>? _employeeRepository;
-    public IGenericRepository<Employee> EmployeeRepository
+    private IEmployeeRepository? _employeeRepository;
+    public IEmployeeRepository EmployeeRepository
     {
         get
         {
             return _employeeRepository
-                ??= new GenericRepository<Employee>(_context);
+                ??= new EmployeeRepository(_context);
         }
     }
 
@@ -46,6 +46,16 @@ public class UnitOfWork : IUnitOfWork
         {
             return _refreshTokenRepository
                 ??= new RefreshTokenRepository(_context);
+        }
+    }
+
+   private IAttachmentRepository? _attachmentRepository;
+    public IAttachmentRepository AttachmentRepository
+    {
+        get
+        {
+            return _attachmentRepository
+                ??= new AttachmentRepository(_context);
         }
     }
 
