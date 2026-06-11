@@ -10,6 +10,7 @@ public class AttendanceRequest : BaseEntity
     public TimeSpan? ToTime { get; private set; }
     public string Reason { get; private set; } = string.Empty;
     public virtual Employee? Employee { get; private set; }
+    public virtual ICollection<AttendanceAttachment> Attachments { get; private set; } = [];
 
     private AttendanceRequest SetEmployeeId(Guid employeeId)
     {

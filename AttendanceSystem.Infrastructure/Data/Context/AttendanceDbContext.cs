@@ -22,6 +22,8 @@ public class AttendanceDbContext : DbContext
     public DbSet<Department> Departments { get; set; }
     public DbSet<EmployeeDepartment> EmployeeDepartments { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<AttendanceAttachment> AttendanceAttachments { get; set; }
+    
 
     // Model Configurations    
     protected override void OnModelCreating(ModelBuilder modelBuilder)

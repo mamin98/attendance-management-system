@@ -12,8 +12,6 @@ public class EmployeeDepartmentConfiguration : IEntityTypeConfiguration<Employee
 
         builder.Property(x => x.DepartmentId).IsRequired(false);
         
-        builder.HasKey(x => new { x.EmployeeId, x.DepartmentId });
-
         builder.HasOne(x => x.Employee)
             .WithMany(e => e.EmployeeDepartments)
             .HasForeignKey(x => x.EmployeeId)
