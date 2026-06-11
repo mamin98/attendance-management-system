@@ -62,4 +62,9 @@ public class AttendanceRequestRepository(AttendanceDbContext context)
             .Where(x => x.EmployeeId == employeeId)
             .ToListAsync();
     }
+
+      public override async Task<AttendanceRequest?> GetByIdAsync(Guid id)
+        => await _context.AttendanceRequests
+            .Include(x => x.Employee)
+            .FirstOrDefaultAsync(x => x.Id == id);
 }
