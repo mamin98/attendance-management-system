@@ -58,6 +58,7 @@ public static class DependencyInjection
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
         services.AddScoped<IEmailService, EmailService>();
 
 
