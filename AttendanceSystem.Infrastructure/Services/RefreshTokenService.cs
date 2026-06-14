@@ -12,6 +12,7 @@ public class RefreshTokenService(IUnitOfWork unitOfWork)
     {
         RefreshToken token = RefreshToken.Create(employeeId, RefreshTokenExpiry.SevenDays);
         await _unitOfWork.RefreshTokenRepository.AddAsync(token);
+        await _unitOfWork.SaveChangesAsync();
         
         return token.Token;
     }

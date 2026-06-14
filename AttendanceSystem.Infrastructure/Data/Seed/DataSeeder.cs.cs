@@ -1,22 +1,22 @@
+using AttendanceSystem.Application;
 using AttendanceSystem.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace AttendanceSystem.Infrastructure;
 
-public class DataSeeder
+public class DataSeeder(AttendanceDbContext context, IPasswordHasher passwordHasher)
 {
-    private readonly AttendanceDbContext _context;
-
-    public DataSeeder(AttendanceDbContext context) => _context = context;
+    readonly IPasswordHasher _passwordHasher = passwordHasher;
+    readonly AttendanceDbContext _context = context;
 
     public async Task SeedAsync()
     {
         if (await _context.Employees.AnyAsync())
             return;
 
-        
+
         // IDs
-        
+
         Guid hrDeptId = Guid.NewGuid();
         Guid itDeptId = Guid.NewGuid();
         Guid finDeptId = Guid.NewGuid();
@@ -29,7 +29,11 @@ public class DataSeeder
         Guid emp2Id = Guid.NewGuid();
         Guid emp3Id = Guid.NewGuid();
 
-                
+        string managerHash = _passwordHasher.Hash("Manager@1234");
+        string employeeHash = _passwordHasher.Hash("Employee@1234");
+        string adminHash = _passwordHasher.Hash("Admin@1234");
+
+
         Department hrDept = Department.Create(null, "HR", "الموارد");
         hrDept.SetId(hrDeptId);
 
@@ -41,21 +45,21 @@ public class DataSeeder
 
         await _context.Departments.AddRangeAsync(hrDept, itDept, finDept);
         await _context.SaveChangesAsync();
-        
-        
-        Employee hrManager = Employee.Create(EmployeeRole.Manager, "Sara", "سارة", "hr@c.com", "Manager@1234");
+
+
+        Employee hrManager = Employee.Create(EmployeeRole.Manager, "Sara", "سارة", "hr@c.com", managerHash);
         hrManager.SetId(hrManagerId);
 
-        Employee itManager = Employee.Create(EmployeeRole.Manager, "Omar", "عمر", "it@c.com", "Manager@1234");
+        Employee itManager = Employee.Create(EmployeeRole.Manager, "Omar", "عمر", "it@c.com", managerHash);
         itManager.SetId(itManagerId);
 
-        Employee finManager = Employee.Create(EmployeeRole.Manager, "Mona", "منى", "fin@c.com", "Manager@1234");
+        Employee finManager = Employee.Create(EmployeeRole.Manager, "Mona", "منى", "fin@c.com", managerHash);
         finManager.SetId(finManagerId);
 
         await _context.Employees.AddRangeAsync(hrManager, itManager, finManager);
         await _context.SaveChangesAsync();
 
-                
+
         hrDept.SetManagerId(hrManager.Id);
         itDept.SetManagerId(itManager.Id);
         finDept.SetManagerId(finManager.Id);
@@ -63,23 +67,23 @@ public class DataSeeder
         _context.Departments.UpdateRange(hrDept, itDept, finDept);
         await _context.SaveChangesAsync();
 
-                
-        Employee emp1 = Employee.Create(EmployeeRole.Employee, "Ali", "علي", "a@c.com", "Employee@1234");
+
+        Employee emp1 = Employee.Create(EmployeeRole.Employee, "Ali", "علي", "a@c.com", employeeHash);
         emp1.SetId(emp1Id);
 
-        Employee emp2 = Employee.Create(EmployeeRole.Employee, "Youssef", "يوسف", "y@c.com", "Employee@1234");
+        Employee emp2 = Employee.Create(EmployeeRole.Employee, "Youssef", "يوسف", "y@c.com", employeeHash);
         emp2.SetId(emp2Id);
 
-        Employee emp3 = Employee.Create(EmployeeRole.Employee, "Nour", "نور", "n@c.com", "Employee@1234");
+        Employee emp3 = Employee.Create(EmployeeRole.Employee, "Nour", "نور", "n@c.com", employeeHash);
         emp3.SetId(emp3Id);
 
-        Employee admin = Employee.Create(EmployeeRole.Admin, "Admin", "مدير النظام", "admin@c.com", "Admin@1234");
+        Employee admin = Employee.Create(EmployeeRole.Admin, "Admin", "مدير النظام", "admin@c.com", adminHash);
         admin.SetId(Guid.NewGuid());
 
         await _context.Employees.AddRangeAsync(emp1, emp2, emp3, admin);
         await _context.SaveChangesAsync();
 
-                
+
         await _context.Set<EmployeeDepartment>().AddRangeAsync(
             EmployeeDepartment.Create(emp1.Id, itDept.Id),
             EmployeeDepartment.Create(emp2.Id, itDept.Id),
@@ -89,7 +93,7 @@ public class DataSeeder
 
         await _context.SaveChangesAsync();
 
-                
+
         AttendanceRequest att1 = AttendanceRequest.Create(
             emp1.Id,
             RequestType.Late,
