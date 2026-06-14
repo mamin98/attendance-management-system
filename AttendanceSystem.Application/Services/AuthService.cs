@@ -5,23 +5,24 @@ namespace AttendanceSystem.Application;
 public class AuthService(
     IUnitOfWork unitOfWork,
     IJwtTokenGenerator jwtTokenGenerator,
-    IRefreshTokenService refreshTokenService)
+    IRefreshTokenService refreshTokenService,
+    IPasswordHasher passwordHasher)
     : IAuthService
 {
     readonly IUnitOfWork _unitOfWork = unitOfWork;
     readonly IJwtTokenGenerator _jwtTokenGenerator = jwtTokenGenerator;
     readonly IRefreshTokenService _refreshTokenService = refreshTokenService;
+    readonly IPasswordHasher _passwordHasher = passwordHasher;
 
     public async Task<LoginResponseDto> LoginAsync(
         LoginRequestDto dto)
     {
         Employee? employee = await _unitOfWork.EmployeeRepository.GetByEmailAsync(dto.Email);
 
-        if (employee is null || !employee.VerifyPassword(dto.Password))
+        if (employee is null || !_passwordHasher.Verify(dto.Password, employee.PasswordHash))
             throw new UnauthorizedException("Invalid credentials");
 
-        string token =
-            _jwtTokenGenerator.GenerateToken(employee);
+        string token = _jwtTokenGenerator.GenerateToken(employee);
         string refreshToken = await _refreshTokenService.CreateAsync(employee.Id);
 
         return new LoginResponseDto
@@ -37,10 +38,11 @@ public class AuthService(
     {
         Employee? employee = await _unitOfWork.EmployeeRepository
             .GetByIdAsync(employeeId) ?? throw new NotFoundException("Employee not found");
-        if (!employee.VerifyPassword(dto.CurrentPassword))
+        
+        if (!_passwordHasher.Verify(dto.CurrentPassword, employee.PasswordHash))
             throw new UnauthorizedException("Current password is incorrect");
 
-        employee.UpdatePassword(dto.NewPassword);
+        employee.UpdatePasswordHash(_passwordHasher.Hash(dto.NewPassword));
 
         _unitOfWork.EmployeeRepository.Update(employee);
         await _unitOfWork.SaveChangesAsync();
