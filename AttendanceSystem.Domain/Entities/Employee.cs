@@ -33,11 +33,9 @@ public class Employee : BaseEntity
         return this;
     }
 
-    public bool VerifyPassword(string plainPassword)
-        => BCrypt.Net.BCrypt.Verify(plainPassword, PasswordHash);
-
-    public void UpdatePassword(string newPlainPassword)
-        => SetPasswordHash(BCrypt.Net.BCrypt.HashPassword(newPlainPassword));
+    public void UpdatePasswordHash(string newHash)
+    => SetPasswordHash(newHash);
+    
     private Employee SetPasswordHash(string passwordHash)
     {
         PasswordHash = passwordHash;
