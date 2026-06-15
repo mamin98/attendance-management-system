@@ -14,7 +14,7 @@ public class AuthController(IAuthService authService)
 
     [HttpPost("login")]
     public async Task<IActionResult> Login(
-        LoginRequestDto dto)
+        [FromBody] LoginRequestDto dto)
     {
         LoginResponseDto result =
             await _authService.LoginAsync(dto);
@@ -36,4 +36,20 @@ public class AuthController(IAuthService authService)
         return Ok(ApiResponse<string>.SuccessResponse(null, "Password changed successfully"));
     }
 
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshRequestDto dto)
+    {
+        LoginResponseDto result = await _authService.RefreshAsync(dto.RefreshToken);
+
+        return Ok(ApiResponse<LoginResponseDto>.SuccessResponse(result));
+    }
+
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout([FromBody] RefreshRequestDto dto)
+    {
+        await _authService.LogoutAsync(dto.RefreshToken);
+
+        return Ok(ApiResponse<string>.SuccessResponse(null, "Logged out successfully"));
+    }
 }
