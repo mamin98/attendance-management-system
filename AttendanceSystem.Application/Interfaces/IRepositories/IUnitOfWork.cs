@@ -4,8 +4,8 @@ namespace AttendanceSystem.Application;
 
 public interface IUnitOfWork
 {
-    IGenericRepository<Department> DepartmentRepository { get; }
     IEmployeeRepository EmployeeRepository { get; }
+    IDepartmentRepository DepartmentRepository { get; }
     IAttendanceRequestRepository AttendanceRequestRepository { get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }
     IAttachmentRepository AttachmentRepository { get; }

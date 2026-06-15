@@ -19,13 +19,13 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    private IGenericRepository<Department>? _departmentRepository;
-    public IGenericRepository<Department> DepartmentRepository
+    private IDepartmentRepository? _departmentRepository;
+    public IDepartmentRepository DepartmentRepository
     {
         get
         {
             return _departmentRepository
-                ??= new GenericRepository<Department>(_context);
+                ??= new DepartmentRepository(_context);
         }
     }   
 
