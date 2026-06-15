@@ -1,10 +1,17 @@
+using System.Linq.Expressions;
 using AttendanceSystem.Domain;
 
 namespace AttendanceSystem.Application;
+
 public interface IGenericRepository<TEntity>
     where TEntity : BaseEntity
 {
-    Task<PagedResult<TEntity>> GetAllWithPaginationAsync(int page, int pageSize);
+    Task<PagedResult<TEntity>> GetAllWithPaginationAsync(
+    int page,
+    int pageSize,
+    Expression<Func<TEntity, bool>>? filter = null,
+    Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+    bool ignoreQueryFilters = false);
     Task<IReadOnlyList<TEntity>> GetAllAsync();
     Task<TEntity?> GetByIdAsync(Guid id);
     Task<bool> IsExistAsync(Guid id);

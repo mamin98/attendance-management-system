@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AttendanceSystem.Application;
 using AttendanceSystem.Domain;
 using Microsoft.EntityFrameworkCore;
@@ -12,15 +13,30 @@ public class GenericRepository<TEntity>
 
     public GenericRepository(AttendanceDbContext context) => _context = context;
 
-    public async Task<PagedResult<TEntity>> GetAllWithPaginationAsync(int page, int pageSize)
+    public async Task<PagedResult<TEntity>> GetAllWithPaginationAsync(
+        int page,
+        int pageSize,
+        Expression<Func<TEntity, bool>>? filter = null,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
+        bool ignoreQueryFilters = false)
     {
-        IQueryable<TEntity> query = _context.Set<TEntity>().AsNoTracking().AsQueryable();
+        IQueryable<TEntity> query = _context.Set<TEntity>().AsQueryable();
+
+        if (ignoreQueryFilters)
+            query = query.IgnoreQueryFilters();
+
+        if (include is not null)
+            query = include(query);
+
+        if (filter is not null)
+            query = query.Where(filter);
 
         int totalCount = await query.CountAsync();
 
         List<TEntity> items = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .AsNoTracking()
             .ToListAsync();
 
         return new PagedResult<TEntity>
@@ -31,7 +47,6 @@ public class GenericRepository<TEntity>
             PageSize = pageSize
         };
     }
-
     public async Task<IReadOnlyList<TEntity>> GetAllAsync()
         => await _context.Set<TEntity>().AsNoTracking().ToListAsync();
 
@@ -52,5 +67,5 @@ public class GenericRepository<TEntity>
         entity.SoftDelete();
         _context.Set<TEntity>().Update(entity);
 
-    } 
+    }
 }
