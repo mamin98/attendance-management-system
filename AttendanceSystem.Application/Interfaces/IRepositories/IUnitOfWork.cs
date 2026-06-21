@@ -9,6 +9,7 @@ public interface IUnitOfWork
     IAttendanceRequestRepository AttendanceRequestRepository { get; }
     IRefreshTokenRepository RefreshTokenRepository { get; }
     IAttachmentRepository AttachmentRepository { get; }
+    IGenericRepository<EmployeeDepartment> EmployeeDepartmentRepository { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

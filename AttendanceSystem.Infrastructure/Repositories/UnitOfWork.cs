@@ -8,7 +8,7 @@ public class UnitOfWork : IUnitOfWork
     readonly AttendanceDbContext _context;
 
     public UnitOfWork(AttendanceDbContext context) => _context = context;
-    
+
     private IEmployeeRepository? _employeeRepository;
     public IEmployeeRepository EmployeeRepository
     {
@@ -27,7 +27,7 @@ public class UnitOfWork : IUnitOfWork
             return _departmentRepository
                 ??= new DepartmentRepository(_context);
         }
-    }   
+    }
 
     private IAttendanceRequestRepository? _attendanceRequestRepository;
     public IAttendanceRequestRepository AttendanceRequestRepository
@@ -49,7 +49,7 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-   private IAttachmentRepository? _attachmentRepository;
+    private IAttachmentRepository? _attachmentRepository;
     public IAttachmentRepository AttachmentRepository
     {
         get
@@ -59,7 +59,17 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
+    private IGenericRepository<EmployeeDepartment>? _employeeDepartmentRepository;
+    public IGenericRepository<EmployeeDepartment> EmployeeDepartmentRepository
+    {
+        get
+        {
+            return _employeeDepartmentRepository
+                ??= new GenericRepository<EmployeeDepartment>(_context);
+        }
+    }
+
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
-    => await _context.SaveChangesAsync(cancellationToken);    
+    => await _context.SaveChangesAsync(cancellationToken);
 }
