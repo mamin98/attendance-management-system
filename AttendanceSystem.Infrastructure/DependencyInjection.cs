@@ -44,20 +44,22 @@ public static class DependencyInjection
             });
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+        services.AddScoped<IEmployeeDepartmentRepository, EmployeeDepartmentRepository>();
         services.AddScoped<IAttendanceRequestRepository, AttendanceRequestRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IAttachmentRepository, AttachmentRepository>();
+        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
+        services.AddScoped<IEmployeeDepartmentService, EmployeeDepartmentService>();
         services.AddScoped<IAttendanceRequestService, AttendanceRequestService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();        
         services.AddScoped<IAttachmentService, AttachmentService>();
         services.AddScoped<IAuthService, AuthService>();
 
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
-        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
         services.AddScoped<IEmailService, EmailService>();
 
