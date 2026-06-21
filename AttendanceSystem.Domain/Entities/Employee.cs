@@ -63,7 +63,7 @@ public class Employee : BaseEntity
     {
         return new Employee()
            .ApplyData(role, nameEn, nameAr, email)
-           .SetPasswordHash(BCrypt.Net.BCrypt.HashPassword(passwordHash));
+           .SetPasswordHash(passwordHash);
 
     }
 
