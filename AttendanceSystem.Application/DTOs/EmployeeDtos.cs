@@ -14,6 +14,17 @@ public class CreateEmployeeDto : EmployeeDataDto
 {
     public string Password { get; set; } = string.Empty;
     public List<Guid> DepartmentIds { get; set; } = [];
+
+    public Employee ToEntity()
+    {
+        return Employee.Create(
+            Role,
+            NameEnglish,
+            NameArabic,
+            Email,            
+            Password);
+
+    }
 }
 
 public class UpdateEmployeeDto : EmployeeDataDto
