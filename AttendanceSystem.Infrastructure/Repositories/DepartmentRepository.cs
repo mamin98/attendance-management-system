@@ -36,7 +36,13 @@ public class DepartmentRepository(AttendanceDbContext context)
         => await _context.Departments
             .AsNoTracking()
             .Include(x => x.Manager)
-            .Include(x => x.EmployeeDepartments)            
+            .Include(x => x.EmployeeDepartments)
             .FirstOrDefaultAsync(x => x.Id == id);
 
+
+    public async Task<List<Guid>> GetExistingIdsAsync(List<Guid> ids)
+        => await _context.Departments
+            .Where(x => ids.Contains(x.Id))
+            .Select(x => x.Id)
+            .ToListAsync();
 }
