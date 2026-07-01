@@ -9,3 +9,4 @@ public interface IDepartmentService
     Task UpdateAsync(Guid id, UpdateDepartmentDto dto);
     Task DeleteAsync(Guid id);
 }
+    

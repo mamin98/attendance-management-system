@@ -42,7 +42,7 @@ public class AuthService(
         if (!_passwordHasher.Verify(dto.CurrentPassword, employee.PasswordHash))
             throw new UnauthorizedException("Current password is incorrect");
 
-        employee.UpdatePasswordHash(_passwordHasher.Hash(dto.NewPassword));
+        employee.ChangePassword(_passwordHasher.Hash(dto.NewPassword));
 
         _unitOfWork.EmployeeRepository.Update(employee);
         await _unitOfWork.SaveChangesAsync();
