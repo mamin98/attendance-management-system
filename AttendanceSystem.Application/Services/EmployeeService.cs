@@ -3,11 +3,13 @@ using AttendanceSystem.Domain;
 namespace AttendanceSystem.Application;
 
 public class EmployeeService(
-    IUnitOfWork unitOfWork,
-    IPasswordHasher passwordHasher) : IEmployeeService
+    IEmployeeDepartmentService employeeDepartmentService,
+    IPasswordHasher passwordHasher,
+    IUnitOfWork unitOfWork) : IEmployeeService
 {
-    readonly IUnitOfWork _unitOfWork = unitOfWork;
+    readonly IEmployeeDepartmentService _employeeDepartmentService = employeeDepartmentService;
     readonly IPasswordHasher _passwordHasher = passwordHasher;
+    readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<PagedResult<EmployeeDto>> GetAllWithPaginationAsync(EmployeeSearchDto search)
     {
@@ -36,10 +38,10 @@ public class EmployeeService(
 
     public async Task CreateAsync(CreateEmployeeDto dto)
     {
-        bool emailExists = await _unitOfWork.EmployeeRepository
+        bool isEmailUnique = await _unitOfWork.EmployeeRepository
             .IsEmailUniqueAsync(dto.Email);
 
-        if (!emailExists)
+        if (!isEmailUnique)
             throw new ValidationException("Email is already in use");
 
         string passwordHash = _passwordHasher.Hash(dto.Password);
@@ -50,10 +52,10 @@ public class EmployeeService(
         await _unitOfWork.EmployeeRepository.AddAsync(entity);
         await _unitOfWork.SaveChangesAsync();
 
-        if (dto.DepartmentIds.Count > 0)
-            await AssignDepartmentsAsync(entity.Id, dto.DepartmentIds);
+        // if (dto.DepartmentIds.Count > 0)
+        //     await AssignDepartmentsAsync(entity.Id, dto.DepartmentIds);
 
-        await _unitOfWork.SaveChangesAsync();
+        // await _unitOfWork.SaveChangesAsync();
 
         // Employee? created = await _unitOfWork.EmployeeRepository.GetByIdAsync(entity.Id);
         // return created!.ToDto();
@@ -74,11 +76,12 @@ public class EmployeeService(
         entity.Update(dto.Role, dto.NameEnglish, dto.NameArabic, dto.Email);
 
         _unitOfWork.EmployeeRepository.Update(entity);
-
-        if (dto.DepartmentIds.Count > 0)
-            await AssignDepartmentsAsync(id, dto.DepartmentIds);
-
         await _unitOfWork.SaveChangesAsync();
+
+        // if (dto.DepartmentIds.Count > 0)
+        //     await AssignDepartmentsAsync(id, dto.DepartmentIds);
+
+        // await _unitOfWork.SaveChangesAsync();
 
         // Employee? updated = await _unitOfWork.EmployeeRepository.GetByIdAsync(id);
         // return updated!.ToDto();
@@ -109,64 +112,8 @@ public class EmployeeService(
     //     await _unitOfWork.SaveChangesAsync();
     // }
 
-    public async Task AssignDepartmentsAsync(
-     Guid employeeId,
-     AssignDepartmentsDto dto)
-    {
-        bool employeeExists = await _unitOfWork.EmployeeRepository
-            .IsExistAsync(employeeId);
+    public Task AssignDepartmentsAsync(Guid employeeId, AssignDepartmentsDto dto)
+        => _employeeDepartmentService.AssignDepartmentsAsync(employeeId, dto);
 
-        if (!employeeExists)
-            throw new NotFoundException("Employee not found");
-
-        List<Guid> incomingIds = dto.Departments
-            .Select(x => x.DepartmentId)
-            .ToList();
-
-        IReadOnlyList<EmployeeDepartment> existing = await _unitOfWork
-            .EmployeeDepartmentRepository
-            .GetByEmployeeIdAsync(employeeId);
-
-        List<Guid> validDeptIds = await _unitOfWork.DepartmentRepository
-            .GetExistingIdsAsync(incomingIds);
-
-        List<Guid> invalidIds = incomingIds
-            .Except(validDeptIds)
-            .ToList();
-
-        if (invalidIds.Count > 0)
-            throw new NotFoundException(
-                $"Departments not found: {string.Join(", ", invalidIds)}");
-
-        string today = DateTime.UtcNow.ToString(AttendanceSystemConsts.DateFormat);
-
-        List<EmployeeDepartment> toTerminate = existing
-            .Where(x => x.IsActive &&
-                        !incomingIds.Contains(x.DepartmentId!.Value))
-            .ToList();
-
-        foreach (EmployeeDepartment ed in toTerminate)
-            ed.Terminate(today);
-
-        if (toTerminate.Count > 0)
-            _unitOfWork.EmployeeDepartmentRepository.UpdateRange(toTerminate);
-
-        HashSet<Guid> existingDeptIds = existing
-            .Select(x => x.DepartmentId!.Value)
-            .ToHashSet();
-
-        List<EmployeeDepartment> toAdd = dto.Departments
-            .Where(x => !existingDeptIds.Contains(x.DepartmentId))
-            .Select(x => EmployeeDepartment.Create(
-                employeeId,
-                x.DepartmentId,
-                x.StartDate,
-                x.EndDate))
-            .ToList();
-
-        if (toAdd.Count > 0)
-            await _unitOfWork.EmployeeDepartmentRepository.AddRangeAsync(toAdd);
-
-        await _unitOfWork.SaveChangesAsync();
-    }
+    
 }

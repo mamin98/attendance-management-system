@@ -9,5 +9,5 @@ public interface IEmployeeService
     Task UpdateAsync(Guid id, UpdateEmployeeDto dto);
     Task DeactivateAsync(Guid id);
     //Task ActivateAsync(Guid id);
-   Task AssignDepartmentsAsync(Guid employeeId, List<Guid> departmentIds);
+    Task AssignDepartmentsAsync(Guid employeeId, AssignDepartmentsDto assignDepartmentsDto);
 }
