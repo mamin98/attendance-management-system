@@ -3,12 +3,10 @@ using AttendanceSystem.Domain;
 
 namespace AttendanceSystem.Infrastructure;
 
-public class UnitOfWork : IUnitOfWork
+public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
 {
-    readonly AttendanceDbContext _context;
-
-    public UnitOfWork(AttendanceDbContext context) => _context = context;
-
+    readonly AttendanceDbContext _context = context;
+    
     private IEmployeeRepository? _employeeRepository;
     public IEmployeeRepository EmployeeRepository
     {
@@ -59,13 +57,13 @@ public class UnitOfWork : IUnitOfWork
         }
     }
 
-    private IGenericRepository<EmployeeDepartment>? _employeeDepartmentRepository;
-    public IGenericRepository<EmployeeDepartment> EmployeeDepartmentRepository
+    private IEmployeeDepartmentRepository? _employeeDepartmentRepository;
+    public IEmployeeDepartmentRepository EmployeeDepartmentRepository
     {
         get
         {
             return _employeeDepartmentRepository
-                ??= new GenericRepository<EmployeeDepartment>(_context);
+                ??= new EmployeeDepartmentRepository(_context);
         }
     }
 
