@@ -9,31 +9,26 @@ public class AttachmentService(
 {
     readonly IFileStorageService _fileStorageService = fileStorageService;
     readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private static readonly string[] AllowedExtensions = 
+    private static readonly string[] AllowedExtensions =
         [".pdf", ".jpg", ".jpeg", ".png"];
     private const long MaxFileSizeBytes = 5 * 1024 * 1024;
 
     public async Task<List<AttachmentDto>> GetByRequestIdAsync(Guid requestId)
     {
-        bool requestExists = await _unitOfWork.AttendanceRequestRepository
-            .IsExistAsync(requestId);
-
-        if (!requestExists)
-            throw new NotFoundException("Attendance request not found");
+        bool requestExists = await _unitOfWork.AttendanceRequestRepository.IsExistAsync(requestId);
+        if (!requestExists) throw new NotFoundException("Attendance request not found");
 
         IReadOnlyList<AttendanceAttachment> attachments = await _unitOfWork
-            .AttachmentRepository
-            .GetAllAsync(); 
+            .AttachmentRepository.GetByRequestIdAsync(requestId);
 
-        return [.. attachments
-            .Where(x => x.AttendanceRequestId == requestId)
-            .Select(x => new AttachmentDto
+        return [.. attachments.Select(x => new AttachmentDto
             {
                 Id = x.Id,
                 FileName = x.FileName,
                 FileSizeBytes = x.FileSizeBytes,
                 CreatedAt = x.CreatedAt
-            })];
+            }
+            )];
     }
 
     public async Task AddAsync(Guid requestId, IFormFile file)
@@ -62,7 +57,7 @@ public class AttachmentService(
     {
         AttendanceAttachment? attachment = await _unitOfWork.AttachmentRepository
             .GetByIdAsync(attachmentId) ?? throw new NotFoundException("Attachment not found");
-        
+
         Stream stream = _fileStorageService.GetStream(attachment.FilePath);
         return (stream, attachment.FileName);
     }
