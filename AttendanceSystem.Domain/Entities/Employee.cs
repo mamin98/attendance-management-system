@@ -33,20 +33,14 @@ public class Employee : BaseEntity
         return this;
     }
 
-    public void UpdatePasswordHash(string newHash)
-    => SetPasswordHash(newHash);
-    
     private Employee SetPasswordHash(string passwordHash)
     {
         PasswordHash = passwordHash;
         return this;
     }
 
-    public Employee ChangePassword(
-        string passwordHash)
-    {
-        return SetPasswordHash(passwordHash);
-    }
+    public Employee ChangePassword(string passwordHash)
+    => SetPasswordHash(passwordHash);    
 
     private Employee SetRole(EmployeeRole role)
     {

@@ -85,10 +85,10 @@ public class DataSeeder(AttendanceDbContext context, IPasswordHasher passwordHas
 
 
         await _context.Set<EmployeeDepartment>().AddRangeAsync(
-            EmployeeDepartment.Create(emp1.Id, itDept.Id),
-            EmployeeDepartment.Create(emp2.Id, itDept.Id),
-            EmployeeDepartment.Create(emp3.Id, hrDept.Id),
-            EmployeeDepartment.Create(admin.Id, finDept.Id)
+            EmployeeDepartment.Create(emp1.Id, itDept.Id, DateTime.UtcNow.ToString(AttendanceSystemConsts.DateFormat), string.Empty),
+            EmployeeDepartment.Create(emp2.Id, itDept.Id, DateTime.UtcNow.ToString(AttendanceSystemConsts.DateFormat), string.Empty),
+            EmployeeDepartment.Create(emp3.Id, hrDept.Id, DateTime.UtcNow.ToString(AttendanceSystemConsts.DateFormat), string.Empty),
+            EmployeeDepartment.Create(admin.Id, finDept.Id, DateTime.UtcNow.ToString(AttendanceSystemConsts.DateFormat), string.Empty)
         );
 
         await _context.SaveChangesAsync();

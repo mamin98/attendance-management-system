@@ -99,9 +99,10 @@ public class AttendanceRequestsController(
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(
+    Guid id,        
     [FromBody] UpdateAttendanceRequestDto dto)
     {
-        await _service.UpdateAsync(dto.Id, dto);
+        await _service.UpdateAsync(id, dto);
 
         return Ok(
             ApiResponse<string>.SuccessResponse(
