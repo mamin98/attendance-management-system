@@ -4,11 +4,10 @@ using System.Text.Json;
 
 namespace AttendanceSystem.API;
 
-public class ExceptionMiddleware
+public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
 {
-    readonly RequestDelegate _next;
-
-    public ExceptionMiddleware(RequestDelegate next) => _next = next;
+    readonly RequestDelegate _next = next;
+    readonly ILogger<ExceptionMiddleware> _logger = logger;
 
     public async Task InvokeAsync(HttpContext context)
     {
@@ -22,9 +21,7 @@ public class ExceptionMiddleware
         }
     }
 
-    private static async Task HandleExceptionAsync(
-        HttpContext context,
-        Exception exception)
+    private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
 
@@ -37,14 +34,17 @@ public class ExceptionMiddleware
             _ => HttpStatusCode.InternalServerError
         };
 
+        // Known/expected exceptions -> Warning. Everything else -> Error (with full stack trace).
+        if (statusCode == HttpStatusCode.InternalServerError)
+            _logger.LogError(exception, "Unhandled exception on {Path}", context.Request.Path);
+        else
+            _logger.LogWarning("{ExceptionType} on {Path}: {Message}",
+                exception.GetType().Name, context.Request.Path, exception.Message);
+
         context.Response.StatusCode = (int)statusCode;
 
-        ApiResponse<string> response =
-            ApiResponse<string>.FailureResponse(
-                exception.Message);
-
-        string json =
-            JsonSerializer.Serialize(response);
+        ApiResponse<string> response = ApiResponse<string>.FailureResponse(exception.Message);
+        string json = JsonSerializer.Serialize(response);
 
         await context.Response.WriteAsync(json);
     }
