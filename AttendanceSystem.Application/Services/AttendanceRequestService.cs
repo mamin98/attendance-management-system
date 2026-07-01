@@ -1,11 +1,15 @@
 using AttendanceSystem.Domain;
+using Microsoft.Extensions.Logging;
 
 namespace AttendanceSystem.Application;
 
-public class AttendanceRequestService(IUnitOfWork unitOfWork, IEmailService emailService) : IAttendanceRequestService
+public class AttendanceRequestService(IUnitOfWork unitOfWork,
+    IEmailService emailService,
+    ILogger<AttendanceRequestService> logger) : IAttendanceRequestService
 {
     readonly IUnitOfWork _unitOfWork = unitOfWork;
     readonly IEmailService _emailService = emailService;
+    readonly ILogger<AttendanceRequestService> _logger = logger;
 
     public async Task<PagedResult<AttendanceRequestDto>> GetAllWithPaginationAsync(
     AttendanceRequestSearchDto searchDto)
@@ -122,10 +126,15 @@ public class AttendanceRequestService(IUnitOfWork unitOfWork, IEmailService emai
             await _emailService.SendAsync(
                 request.Employee.Email,
                 $"Attendance Request {status}",
-                $"Your {request.RequestType} request for {request.RequestDate:dd/MM/yyyy} has been {status.ToLower()}."
+                $"Your {request.RequestType} request for {request.RequestDate:AttendanceSystemConsts.DateFormat} has been {status.ToLower()}."
             );
         }
-        catch { /* log later — don't crash the request */ }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex,
+                "Failed to send status email for AttendanceRequest {RequestId} to employee {EmployeeId}",
+                request.Id, request.EmployeeId);
+        }
     }
 
 }
