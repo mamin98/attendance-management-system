@@ -1,5 +1,3 @@
-using BCrypt.Net;
-
 namespace AttendanceSystem.Domain;
 
 public class Employee : BaseEntity
@@ -14,12 +12,13 @@ public class Employee : BaseEntity
     public virtual ICollection<AttendanceRequest> AttendanceRequests { get; private set; } = [];
     public virtual ICollection<Department> DepartmentManagers { get; private set; } = [];
     public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = [];
+    public virtual ICollection<EmployeeShift> EmployeeShifts { get; private set; } = [];
+
     private Employee SetNameEnglish(string name)
     {
         NameEnglish = name.Trim();
         return this;
     }
-
 
     private Employee SetNameArabic(string name)
     {
@@ -40,7 +39,7 @@ public class Employee : BaseEntity
     }
 
     public Employee ChangePassword(string passwordHash)
-    => SetPasswordHash(passwordHash);    
+    => SetPasswordHash(passwordHash);
 
     private Employee SetRole(EmployeeRole role)
     {
