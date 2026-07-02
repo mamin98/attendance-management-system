@@ -22,3 +22,8 @@ dist/
 
 # Logs
 *.log
+# Logs
+*.log
+Logs/
+**/Logs/
+*.txt
