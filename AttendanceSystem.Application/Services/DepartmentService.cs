@@ -44,6 +44,7 @@ public class DepartmentService(IUnitOfWork unitOfWork) : IDepartmentService
 
         Department department = Department.Create(
             dto.ManagerId,
+            null,
             dto.NameEnglish,
             dto.NameArabic);
 
@@ -69,7 +70,7 @@ public class DepartmentService(IUnitOfWork unitOfWork) : IDepartmentService
                 throw new NotFoundException("Manager not found");
         }
 
-        entity.Update(dto.ManagerId, dto.NameEnglish, dto.NameArabic);
+        entity.Update(dto.ManagerId, null, dto.NameEnglish, dto.NameArabic);
 
         _unitOfWork.DepartmentRepository.Update(entity);
         await _unitOfWork.SaveChangesAsync();

@@ -44,7 +44,7 @@ public class Department : BaseEntity
 
     public Department Update(
         Guid? managerId,
-    Guid? policyId,
+        Guid? policyId,
         string nameEn,
         string nameAr)
         => ApplyData(managerId, policyId, nameEn, nameAr);

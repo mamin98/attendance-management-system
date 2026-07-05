@@ -34,13 +34,13 @@ public class DataSeeder(AttendanceDbContext context, IPasswordHasher passwordHas
         string adminHash = _passwordHasher.Hash("Admin@1234");
 
 
-        Department hrDept = Department.Create(null, "HR", "الموارد");
+        Department hrDept = Department.Create(null, null, "HR", "الموارد");
         hrDept.SetId(hrDeptId);
 
-        Department itDept = Department.Create(null, "IT", "تكنولوجيا المعلومات");
+        Department itDept = Department.Create(null, null, "IT", "تكنولوجيا المعلومات");
         itDept.SetId(itDeptId);
 
-        Department finDept = Department.Create(null, "Finance", "المالية");
+        Department finDept = Department.Create(null, null, "Finance", "المالية");
         finDept.SetId(finDeptId);
 
         await _context.Departments.AddRangeAsync(hrDept, itDept, finDept);
