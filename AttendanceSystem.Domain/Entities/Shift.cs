@@ -16,9 +16,11 @@ public class Shift : BaseEntity
 
     private Shift SetNameEnglish(string name) { NameEnglish = name.Trim(); return this; }
     private Shift SetNameArabic(string name) { NameArabic = name.Trim(); return this; }
-    private Shift SetDates(string startDate, string? endDate)
+    private Shift SetDates(string? startDate, string? endDate)
     {
-        StartDate = DateTime.ParseExact(
+        StartDate = startDate is null
+            ? null
+            : DateTime.ParseExact(
             startDate,
             AttendanceSystemConsts.DateFormat,
             CultureInfo.InvariantCulture,
@@ -48,13 +50,13 @@ public class Shift : BaseEntity
     
     private Shift SetGracePeriod(int minutes) { GracePeriodMinutes = minutes; return this; }
 
-    public static Shift Create(string nameEn, string nameAr, string startDate, string? endDate, int gracePeriodMinutes)
+    public static Shift Create(string nameEn, string nameAr, string? startDate, string? endDate, int gracePeriodMinutes)
         => new Shift().ApplyData(nameEn, nameAr, startDate, endDate, gracePeriodMinutes);
 
-    public Shift Update(string nameEn, string nameAr, string startDate, string? endDate, int gracePeriodMinutes)
+    public Shift Update(string nameEn, string nameAr, string? startDate, string? endDate, int gracePeriodMinutes)
         => ApplyData(nameEn, nameAr, startDate, endDate, gracePeriodMinutes);
 
-    private Shift ApplyData(string nameEn, string nameAr, string startDate, string? endDate, int gracePeriodMinutes)
+    private Shift ApplyData(string nameEn, string nameAr, string? startDate, string? endDate, int gracePeriodMinutes)
     {
         SetNameEnglish(nameEn).SetNameArabic(nameAr).SetDates(startDate, endDate).SetGracePeriod(gracePeriodMinutes);
         return this;
