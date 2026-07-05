@@ -36,7 +36,7 @@ public class ShiftDayDetail : BaseEntity
 
     private ShiftDayDetail ApplyData(Guid shiftId, Guid shiftDayId, string fromTime, string toTime)
     {
-        SetShiftId(shiftId).SetShiftId(shiftDayId).SetTimes(fromTime, toTime);
+        SetShiftId(shiftId).SetShiftDayId(shiftDayId).SetTimes(fromTime, toTime);
         return this;
     }
 }
