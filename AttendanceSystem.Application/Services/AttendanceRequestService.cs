@@ -17,14 +17,7 @@ public class AttendanceRequestService(IUnitOfWork unitOfWork,
     AttendanceRequestSearchDto searchDto)
     {
         PagedResult<AttendanceRequest> data = await _unitOfWork.AttendanceRequestRepository.GetAllWithPaginationAsync(searchDto);
-
-        return new PagedResult<AttendanceRequestDto>
-        {
-            Items = [.. data.Items.Select(x => x.ToDto())],
-            TotalCount = data.TotalCount,
-            Page = data.Page,
-            PageSize = data.PageSize
-        };
+        return data.ToPagedDto(x => x.ToDto());
     }
 
     public async Task<List<AttendanceRequestDto>> GetAllAsync()

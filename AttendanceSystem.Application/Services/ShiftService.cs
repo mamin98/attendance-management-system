@@ -9,14 +9,7 @@ public class ShiftService(IUnitOfWork unitOfWork) : IShiftService
     public async Task<PagedResult<ShiftDto>> GetAllWithPaginationAsync(ShiftSearchDto search)
     {
         PagedResult<Shift> data = await _unitOfWork.ShiftRepository.GetAllWithPaginationAsync(search);
-
-        return new PagedResult<ShiftDto>
-        {
-            Items = [.. data.Items.Select(x => x.ToDto())],
-            TotalCount = data.TotalCount,
-            Page = data.Page,
-            PageSize = data.PageSize
-        };
+        return data.ToPagedDto(x => x.ToDto());
     }
 
     public async Task<List<ShiftDto>> GetAllAsync()

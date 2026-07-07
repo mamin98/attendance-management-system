@@ -9,14 +9,7 @@ public class AttendancePolicyService(IUnitOfWork unitOfWork) : IAttendancePolicy
     public async Task<PagedResult<AttendancePolicyDto>> GetAllWithPaginationAsync(AttendancePolicySearchDto search)
     {
         PagedResult<AttendancePolicy> data = await _unitOfWork.AttendancePolicyRepository.GetAllWithPaginationAsync(search);
-
-        return new PagedResult<AttendancePolicyDto>
-        {
-            Items = [.. data.Items.Select(x => x.ToDto())],
-            TotalCount = data.TotalCount,
-            Page = data.Page,
-            PageSize = data.PageSize
-        };
+        return data.ToPagedDto(x => x.ToDto());
     }
 
     public async Task<List<AttendancePolicyDto>> GetAllAsync()
