@@ -6,7 +6,7 @@ namespace AttendanceSystem.Infrastructure;
 public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
 {
     readonly AttendanceDbContext _context = context;
-    
+
     private IEmployeeRepository? _employeeRepository;
     public IEmployeeRepository EmployeeRepository
     {
@@ -67,6 +67,26 @@ public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
         }
     }
 
+    private IShiftRepository? _shiftRepository;
+    public IShiftRepository ShiftRepository
+        => _shiftRepository ??= new ShiftRepository(_context);
+
+    private IShiftDayRepository? _shiftDayRepository;
+    public IShiftDayRepository ShiftDayRepository
+        => _shiftDayRepository ??= new ShiftDayRepository(_context);
+
+    private IShiftDayDetailRepository? _shiftDayDetailRepository;
+    public IShiftDayDetailRepository ShiftDayDetailRepository
+        => _shiftDayDetailRepository ??= new ShiftDayDetailRepository(_context);
+
+    private IEmployeeShiftRepository? _employeeShiftRepository;
+    public IEmployeeShiftRepository EmployeeShiftRepository
+        => _employeeShiftRepository ??= new EmployeeShiftRepository(_context);
+
+    private IAttendancePolicyRepository? _attendancePolicyRepository;
+    public IAttendancePolicyRepository AttendancePolicyRepository
+        => _attendancePolicyRepository ??= new AttendancePolicyRepository(_context);
+       
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     => await _context.SaveChangesAsync(cancellationToken);
