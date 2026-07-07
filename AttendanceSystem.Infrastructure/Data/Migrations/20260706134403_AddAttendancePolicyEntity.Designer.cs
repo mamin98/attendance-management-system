@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AttendanceSystem.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AttendanceDbContext))]
-    [Migration("20260705132154_Add_AttendancePolicy_Entity")]
-    partial class Add_AttendancePolicy_Entity
+    [Migration("20260706134403_AddAttendancePolicyEntity")]
+    partial class AddAttendancePolicyEntity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -116,18 +116,22 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.Property<string>("NameArabic")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("NameEnglish")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("RequiresManagerApproval")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.HasKey("Id");
 
-                    b.ToTable("AttendancePolicy");
+                    b.ToTable("AttendancePolicies");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.AttendanceRequest", b =>
@@ -389,7 +393,7 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("EmployeeShift");
+                    b.ToTable("EmployeeShifts");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.RefreshToken", b =>
@@ -493,7 +497,7 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shift");
+                    b.ToTable("Shifts");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.ShiftDay", b =>
@@ -536,7 +540,7 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("ShiftDay");
+                    b.ToTable("ShiftDays");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.ShiftDayDetail", b =>
@@ -584,7 +588,7 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("ShiftDayDetail");
+                    b.ToTable("ShiftDayDetails");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.AttendanceAttachment", b =>
@@ -618,7 +622,8 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasOne("AttendanceSystem.Domain.AttendancePolicy", "Policy")
                         .WithMany("Departments")
-                        .HasForeignKey("PolicyId");
+                        .HasForeignKey("PolicyId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Manager");
 
