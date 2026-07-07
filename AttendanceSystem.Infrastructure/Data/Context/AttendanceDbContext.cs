@@ -23,7 +23,12 @@ public class AttendanceDbContext : DbContext
     public DbSet<EmployeeDepartment> EmployeeDepartments { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<AttendanceAttachment> AttendanceAttachments { get; set; }
-    
+    public DbSet<Shift> Shifts { get; set; }
+    public DbSet<ShiftDay> ShiftDays { get; set; }
+    public DbSet<ShiftDayDetail> ShiftDayDetails { get; set; }
+    public DbSet<EmployeeShift> EmployeeShifts { get; set; }
+    public DbSet<AttendancePolicy> AttendancePolicies { get; set; }
+
 
     // Model Configurations    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
