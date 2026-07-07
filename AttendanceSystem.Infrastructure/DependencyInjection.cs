@@ -18,30 +18,30 @@ public static class DependencyInjection
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection")));
 
-         services
-            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                var jwtSettings =
-                    configuration.GetSection("Jwt");
+        services
+           .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+           .AddJwtBearer(options =>
+           {
+               var jwtSettings =
+                   configuration.GetSection("Jwt");
 
-                options.TokenValidationParameters =
-                    new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
+               options.TokenValidationParameters =
+                   new TokenValidationParameters
+                   {
+                       ValidateIssuer = true,
+                       ValidateAudience = true,
+                       ValidateLifetime = true,
+                       ValidateIssuerSigningKey = true,
 
-                        ValidIssuer = jwtSettings["Issuer"],
-                        ValidAudience = jwtSettings["Audience"],
+                       ValidIssuer = jwtSettings["Issuer"],
+                       ValidAudience = jwtSettings["Audience"],
 
-                        IssuerSigningKey =
-                            new SymmetricSecurityKey(
-                                Encoding.UTF8.GetBytes(
-                                    jwtSettings["Key"]!))
-                    };
-            });
+                       IssuerSigningKey =
+                           new SymmetricSecurityKey(
+                               Encoding.UTF8.GetBytes(
+                                   jwtSettings["Key"]!))
+                   };
+           });
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IEmployeeDepartmentRepository, EmployeeDepartmentRepository>();
@@ -49,12 +49,19 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IAttachmentRepository, AttachmentRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        services.AddScoped<IShiftRepository, ShiftRepository>();
+        services.AddScoped<IShiftDayRepository, ShiftDayRepository>();
+        services.AddScoped<IShiftDayDetailRepository, ShiftDayDetailRepository>();
+        services.AddScoped<IEmployeeShiftRepository, EmployeeShiftRepository>();
+        services.AddScoped<IAttendancePolicyRepository, AttendancePolicyRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        
+
         services.AddScoped<IEmployeeDepartmentService, EmployeeDepartmentService>();
         services.AddScoped<IAttendanceRequestService, AttendanceRequestService>();
-        services.AddScoped<IRefreshTokenService, RefreshTokenService>();        
+        services.AddScoped<IAttendancePolicyService, AttendancePolicyService>();
+        services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
+        services.AddScoped<IShiftService, ShiftService>();
         services.AddScoped<IAuthService, AuthService>();
 
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
@@ -69,5 +76,5 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
 }
