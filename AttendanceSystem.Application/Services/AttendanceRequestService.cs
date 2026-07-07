@@ -5,10 +5,12 @@ namespace AttendanceSystem.Application;
 
 public class AttendanceRequestService(IUnitOfWork unitOfWork,
     IEmailService emailService,
+    IAttendancePolicyService policyService,
     ILogger<AttendanceRequestService> logger) : IAttendanceRequestService
 {
     readonly IUnitOfWork _unitOfWork = unitOfWork;
     readonly IEmailService _emailService = emailService;
+    readonly IAttendancePolicyService _policyService = policyService;
     readonly ILogger<AttendanceRequestService> _logger = logger;
 
     public async Task<PagedResult<AttendanceRequestDto>> GetAllWithPaginationAsync(
@@ -51,6 +53,9 @@ public class AttendanceRequestService(IUnitOfWork unitOfWork,
         bool employeeIsExist = await _unitOfWork.EmployeeRepository.IsExistAsync(dto.EmployeeId);
         if (!employeeIsExist)
             throw new NotFoundException("Employee not found");
+
+         await _policyService.ValidateRequestAgainstPolicyAsync(
+            dto.EmployeeId, dto.RequestType, dto.RequestDate, dto.FromTime, dto.ToTime);
 
         AttendanceRequest entity = dto.ToEntity();
 
