@@ -44,23 +44,30 @@ public static class DependencyInjection
            });
 
         services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+        services.AddScoped<IEmployeeLeaveBalanceRepository, EmployeeLeaveBalanceRepository>();
         services.AddScoped<IEmployeeDepartmentRepository, EmployeeDepartmentRepository>();
         services.AddScoped<IAttendanceRequestRepository, AttendanceRequestRepository>();
-        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-        services.AddScoped<IAttachmentRepository, AttachmentRepository>();
-        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
-        services.AddScoped<IShiftRepository, ShiftRepository>();
-        services.AddScoped<IShiftDayRepository, ShiftDayRepository>();
+        services.AddScoped<IAttendancePolicyRepository, AttendancePolicyRepository>();
         services.AddScoped<IShiftDayDetailRepository, ShiftDayDetailRepository>();
         services.AddScoped<IEmployeeShiftRepository, EmployeeShiftRepository>();
-        services.AddScoped<IAttendancePolicyRepository, AttendancePolicyRepository>();
+        services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+        services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
+        services.AddScoped<IAttachmentRepository, AttachmentRepository>();
+        services.AddScoped<ILeaveTypeRepository, LeaveTypeRepository>();
+        services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        services.AddScoped<IShiftDayRepository, ShiftDayRepository>();
+        services.AddScoped<IShiftRepository, ShiftRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+
 
         services.AddScoped<IEmployeeDepartmentService, EmployeeDepartmentService>();
         services.AddScoped<IAttendanceRequestService, AttendanceRequestService>();
         services.AddScoped<IAttendancePolicyService, AttendancePolicyService>();
+        services.AddScoped<ILeaveRequestService, LeaveRequestService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
+        services.AddScoped<ILeaveTypeService, LeaveTypeService>();
         services.AddScoped<IShiftService, ShiftService>();
         services.AddScoped<IAuthService, AuthService>();
 
