@@ -31,3 +31,11 @@ public enum RefreshTokenExpiry
     ThirtyDays   = 30,
     NinetyDays   = 90
 }
+
+public enum LeaveRequestStatus
+{
+    Pending = 1,
+    Approved,
+    Rejected,
+    Cancelled
+}
