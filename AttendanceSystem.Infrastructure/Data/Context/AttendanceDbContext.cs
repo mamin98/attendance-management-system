@@ -28,6 +28,10 @@ public class AttendanceDbContext : DbContext
     public DbSet<ShiftDayDetail> ShiftDayDetails { get; set; }
     public DbSet<EmployeeShift> EmployeeShifts { get; set; }
     public DbSet<AttendancePolicy> AttendancePolicies { get; set; }
+    public DbSet<LeaveType> LeaveTypes { get; set; }
+public DbSet<EmployeeLeaveBalance> EmployeeLeaveBalances { get; set; }
+public DbSet<LeaveRequest> LeaveRequests { get; set; }
+
 
 
     // Model Configurations    
