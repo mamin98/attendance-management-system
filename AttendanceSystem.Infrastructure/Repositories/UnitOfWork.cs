@@ -86,7 +86,20 @@ public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
     private IAttendancePolicyRepository? _attendancePolicyRepository;
     public IAttendancePolicyRepository AttendancePolicyRepository
         => _attendancePolicyRepository ??= new AttendancePolicyRepository(_context);
-       
+
+    private ILeaveTypeRepository? _leaveTypeRepository;
+    public ILeaveTypeRepository LeaveTypeRepository
+        => _leaveTypeRepository ??= new LeaveTypeRepository(_context);
+
+    private IEmployeeLeaveBalanceRepository? _employeeLeaveBalanceRepository;
+    public IEmployeeLeaveBalanceRepository EmployeeLeaveBalanceRepository
+        => _employeeLeaveBalanceRepository ??= new EmployeeLeaveBalanceRepository(_context);
+
+    private ILeaveRequestRepository? _leaveRequestRepository;
+    public ILeaveRequestRepository LeaveRequestRepository
+        => _leaveRequestRepository ??= new LeaveRequestRepository(_context);
+
+
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     => await _context.SaveChangesAsync(cancellationToken);

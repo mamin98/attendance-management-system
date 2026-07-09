@@ -15,6 +15,10 @@ public interface IUnitOfWork
     IShiftDayRepository ShiftDayRepository { get; }
     IShiftDayDetailRepository ShiftDayDetailRepository { get; }
     IEmployeeShiftRepository EmployeeShiftRepository { get; }
+    ILeaveTypeRepository LeaveTypeRepository { get; }
+    IEmployeeLeaveBalanceRepository EmployeeLeaveBalanceRepository { get; }
+    ILeaveRequestRepository LeaveRequestRepository { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
