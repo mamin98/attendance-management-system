@@ -99,6 +99,9 @@ public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
     public ILeaveRequestRepository LeaveRequestRepository
         => _leaveRequestRepository ??= new LeaveRequestRepository(_context);
 
+    private IAttendanceLogRepository? _attendanceLogRepository;
+    public IAttendanceLogRepository AttendanceLogRepository
+        => _attendanceLogRepository ??= new AttendanceLogRepository(_context);
 
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
