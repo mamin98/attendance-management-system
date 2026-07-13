@@ -39,3 +39,15 @@ public enum LeaveRequestStatus
     Rejected,
     Cancelled
 }
+
+
+public enum AttendanceStatus
+{
+    Present = 1,
+    Absent,
+    OffDay,
+    OnLeave,
+    Remote,
+    Permission,
+    NoShiftAssigned
+}
