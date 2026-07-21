@@ -61,9 +61,13 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
+        services.AddScoped<IAttendanceReportExportService, AttendanceReportExportService>();
+        services.AddScoped<IAttendanceCalculationService, AttendanceCalculationService>();
         services.AddScoped<IEmployeeDepartmentService, EmployeeDepartmentService>();
         services.AddScoped<IAttendanceRequestService, AttendanceRequestService>();
         services.AddScoped<IAttendancePolicyService, AttendancePolicyService>();
+        services.AddScoped<IAttendanceLogRepository, AttendanceLogRepository>();
+        services.AddScoped<IAttendanceImportService, AttendanceImportService>(); 
         services.AddScoped<ILeaveRequestService, LeaveRequestService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
