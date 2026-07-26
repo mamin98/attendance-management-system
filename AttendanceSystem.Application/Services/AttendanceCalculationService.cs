@@ -8,12 +8,59 @@ public class AttendanceCalculationService(IUnitOfWork unitOfWork) : IAttendanceC
 
     public async Task<List<MonthlyAttendanceReportDto>> GenerateMonthlyReportAsync(GenerateReportRequestDto request)
     {
-        List<Employee> employees = await ResolveTargetEmployeesAsync(request);
+        DateTime monthStart = new(request.Year, request.Month, 1);
+        DateTime monthEnd = monthStart.AddMonths(1).AddDays(-1);
 
-        List<MonthlyAttendanceReportDto> reports = [];
+        List<Employee> employees = await ResolveTargetEmployeesAsync(request);
+        if (employees.Count == 0)
+            return [];
+
+        List<Guid> employeeIds = [.. employees.Select(e => e.Id)];
+
+        List<AttendanceLog> logs = [.. await _unitOfWork.AttendanceLogRepository
+        .GetByEmployeesAndMonthAsync(employeeIds, request.Year, request.Month)];
+
+        List<LeaveRequest> leaves = [.. await _unitOfWork.LeaveRequestRepository
+        .GetApprovedRequestsAsync(employeeIds, monthStart, monthEnd)];
+
+        List<AttendanceRequest> attendanceRequests = [.. await _unitOfWork.AttendanceRequestRepository
+        .GetApprovedRequestsAsync(employeeIds, monthStart, monthEnd)];
+
+        List<EmployeeShift> shiftAssignments = [.. await _unitOfWork.EmployeeShiftRepository
+        .GetAllWithSearchAsync(x => x.EmployeeId.HasValue && employeeIds.Contains(x.EmployeeId.Value))];
+
+        List<Guid> shiftIds = [.. shiftAssignments
+        .Where(x => x.ShiftId.HasValue)
+        .Select(x => x.ShiftId!.Value)
+        .Distinct()];
+
+        Dictionary<Guid, Shift> shiftsById = shiftIds.Count == 0
+            ? []
+            : (await _unitOfWork.ShiftRepository.GetAllWithSearchAsync(s => shiftIds.Contains(s.Id)))
+                .ToDictionary(s => s.Id);
+
+        Dictionary<Guid, AttendancePolicy?> policyByEmployee = await ResolvePoliciesAsync(employees);
+
+        ILookup<Guid, AttendanceLog> logsByEmployee = logs.ToLookup(x => x.EmployeeId);
+        ILookup<Guid, LeaveRequest> leavesByEmployee = leaves.ToLookup(x => x.EmployeeId);
+        ILookup<Guid, AttendanceRequest> requestsByEmployee = attendanceRequests.ToLookup(x => x.EmployeeId);
+        ILookup<Guid, EmployeeShift> shiftAssignmentsByEmployee = shiftAssignments.ToLookup(x => x.EmployeeId!.Value);
+
+        List<MonthlyAttendanceReportDto> reports = new(employees.Count);
 
         foreach (Employee employee in employees)
-            reports.Add(await BuildReportForEmployeeAsync(employee, request.Year, request.Month));
+        {
+            reports.Add(BuildReportForEmployee(
+                employee,
+                monthStart,
+                monthEnd,
+                [.. logsByEmployee[employee.Id]],
+                [.. shiftAssignmentsByEmployee[employee.Id]],
+                [.. leavesByEmployee[employee.Id]],
+                [.. requestsByEmployee[employee.Id]],
+                policyByEmployee.GetValueOrDefault(employee.Id),
+                shiftsById));
+        }
 
         return reports;
     }
@@ -28,63 +75,110 @@ public class AttendanceCalculationService(IUnitOfWork unitOfWork) : IAttendanceC
             return [employee];
         }
 
-        IReadOnlyList<Employee> all = await _unitOfWork.EmployeeRepository.GetAllAsync();
-
         if (request.DepartmentId.HasValue)
-            return [.. all.Where(e => e.EmployeeDepartments
-                .Any(ed => ed.DepartmentId == request.DepartmentId && ed.EndDate == null))];
+        {
+            List<Employee> employeesExistsInDepartment = [.. await _unitOfWork.EmployeeRepository.GetAllWithSearchAsync(
+            e => e.EmployeeDepartments.Any(ed => ed.DepartmentId == request.DepartmentId && ed.EndDate == null))];
 
-        return [.. all];
+            return [.. employeesExistsInDepartment];
+        }
+
+        return [];
     }
 
-    private async Task<MonthlyAttendanceReportDto> BuildReportForEmployeeAsync(Employee employee, int year, int month)
+    private async Task<Dictionary<Guid, AttendancePolicy?>> ResolvePoliciesAsync(List<Employee> employees)
     {
-        DateTime monthStart = new(year, month, 1);
-        DateTime monthEnd = monthStart.AddMonths(1).AddDays(-1);
+        Dictionary<Guid, Guid> employeeToDepartment = employees
+            .Select(e => new
+            {
+                EmployeeId = e.Id,
+                e.EmployeeDepartments.FirstOrDefault(ed => ed.EndDate is null)?.DepartmentId
+            })
+            .Where(x => x.DepartmentId.HasValue)
+            .ToDictionary(x => x.EmployeeId, x => x.DepartmentId!.Value);
 
-        IReadOnlyList<AttendanceLog> logs = await _unitOfWork.AttendanceLogRepository
-            .GetByEmployeeAndMonthAsync(employee.Id, year, month);
+        Dictionary<Guid, AttendancePolicy?> result = employees.ToDictionary(e => e.Id, _ => (AttendancePolicy?)null);
 
-        IReadOnlyList<EmployeeShift> shiftAssignments = await _unitOfWork.EmployeeShiftRepository
-            .GetByEmployeeIdAsync(employee.Id);
+        if (!employeeToDepartment.Any())
+            return result;
 
-        List<LeaveRequest> approvedLeaves = [.. (await _unitOfWork.LeaveRequestRepository
-            .GetEmployeeRequestsAsync(employee.Id))
-            .Where(x => x.Status == LeaveRequestStatus.Approved
-                && x.StartDate <= monthEnd && x.EndDate >= monthStart)];
+        List<Guid> departmentIds = [.. employeeToDepartment.Values.Distinct()];
 
-        List<AttendanceRequest> approvedRequests = [.. (await _unitOfWork.AttendanceRequestRepository
-            .GetEmployeeRequestsAsync(employee.Id))
-            .Where(x => x.RequestStatus == RequestStatus.Approved
-                && x.RequestDate >= monthStart && x.RequestDate <= monthEnd)];
+        List<Department> departments = [.. await _unitOfWork.DepartmentRepository
+            .GetAllWithSearchAsync(d => departmentIds.Contains(d.Id))];
 
-        AttendancePolicy? policy = await ResolvePolicyAsync(employee.Id);
+        List<Guid> policyIds = [.. departments
+            .Where(d => d.PolicyId.HasValue)
+            .Select(d => d.PolicyId!.Value)
+            .Distinct()];
 
+        Dictionary<Guid, AttendancePolicy> policiesById = policyIds.Count == 0
+            ? []
+            : (await _unitOfWork.AttendancePolicyRepository.GetAllWithSearchAsync(p => policyIds.Contains(p.Id)))
+                .ToDictionary(p => p.Id);
+
+        Dictionary<Guid, Guid?> departmentToPolicyId = departments.ToDictionary(d => d.Id, d => d.PolicyId);
+
+        foreach (KeyValuePair<Guid, Guid> pair in employeeToDepartment)
+        {
+            if (departmentToPolicyId.TryGetValue(pair.Value, out Guid? policyId) 
+                && policyId.HasValue
+                && policiesById.TryGetValue(policyId.Value, out AttendancePolicy? policy))            
+                    result[pair.Key] = policy;            
+        }
+
+        return result;
+    }
+
+    private static MonthlyAttendanceReportDto BuildReportForEmployee(
+        Employee employee,
+        DateTime monthStart,
+        DateTime monthEnd,
+        IReadOnlyList<AttendanceLog> logs,
+        IReadOnlyList<EmployeeShift> shiftAssignments,
+        IReadOnlyList<LeaveRequest> approvedLeaves,
+        IReadOnlyList<AttendanceRequest> approvedRequests,
+        AttendancePolicy? policy,
+        IReadOnlyDictionary<Guid, Shift> shiftsById)
+    {
         MonthlyAttendanceReportDto report = new()
         {
             EmployeeData = employee.ToSimpleDto(),
-            Month = month,
-            Year = year
+            Month = monthStart.Month,
+            Year = monthStart.Year
         };
 
         for (DateTime date = monthStart; date <= monthEnd; date = date.AddDays(1))
         {
-            DailyAttendanceDetailDto detail = await BuildDailyDetailAsync(
-                date, logs, shiftAssignments, approvedLeaves, approvedRequests);
+            DailyAttendanceDetailDto detail = BuildDailyDetail(
+                date, logs, shiftAssignments, approvedLeaves, approvedRequests, shiftsById);
 
             report.Days.Add(detail);
 
-            if (!detail.IsWorkingDay) continue;
+            if (!detail.IsWorkingDay)
+                continue;
 
             report.WorkingDaysInMonth++;
 
             switch (detail.Status)
             {
-                case "Present": report.PresentDays++; break;
-                case "Absent": report.AbsentDays++; break;
-                case "OnLeave": report.ApprovedLeaveDays++; break;
-                case "Remote": report.ApprovedRemoteDays++; break;
-                case "Permission": report.ApprovedPermissionDays++; break;
+                case nameof(AttendanceStatus.Present):
+                    report.PresentDays++;
+                    break;
+                case "Absent":
+                    report.AbsentDays++;
+                    break;
+                case "OnLeave":
+                    report.ApprovedLeaveDays++;
+                    break;
+                case "Remote":
+                    report.ApprovedRemoteDays++;
+                    break;
+                case "Permission":
+                    report.ApprovedPermissionDays++;
+                    break;
+                    // "Incomplete" (checked in, no checkout) intentionally isn't counted
+                    // as Present/Absent — surface it in Days for the UI to flag.
             }
 
             report.TotalWorkedHours += detail.WorkedHours;
@@ -111,68 +205,78 @@ public class AttendanceCalculationService(IUnitOfWork unitOfWork) : IAttendanceC
         return report;
     }
 
-    private async Task<DailyAttendanceDetailDto> BuildDailyDetailAsync(
+    private static DailyAttendanceDetailDto BuildDailyDetail(
         DateTime date,
         IReadOnlyList<AttendanceLog> logs,
         IReadOnlyList<EmployeeShift> shiftAssignments,
-        List<LeaveRequest> approvedLeaves,
-        List<AttendanceRequest> approvedRequests)
+        IReadOnlyList<LeaveRequest> approvedLeaves,
+        IReadOnlyList<AttendanceRequest> approvedRequests,
+        IReadOnlyDictionary<Guid, Shift> shiftsById)
     {
         DailyAttendanceDetailDto detail = new() { Date = date };
 
-        EmployeeShift? activeAssignment = shiftAssignments
-            .FirstOrDefault(x => x.StartDate <= date && (x.EndDate == null || x.EndDate >= date));
+        EmployeeShift? activeAssignment = shiftAssignments.FirstOrDefault(
+            x => x.StartDate <= date && (x.EndDate is null || x.EndDate >= date));
 
-        if (activeAssignment?.ShiftId is null)
+        if (activeAssignment?.ShiftId is null ||
+            !shiftsById.TryGetValue(activeAssignment.ShiftId.Value, out Shift? shift))
         {
             detail.IsWorkingDay = false;
-            detail.Status = AttendanceStatus.NoShiftAssigned.ToString();
+            detail.Status = nameof(AttendanceStatus.NoShiftAssigned);
             return detail;
         }
 
-        Shift? shift = await _unitOfWork.ShiftRepository.GetByIdAsync(activeAssignment.ShiftId.Value);
-        ShiftDay? shiftDay = shift?.ShiftDays.FirstOrDefault(x => x.Day == DateOnly.FromDateTime(date));
+        ShiftDay? shiftDay = shift.ShiftDays.FirstOrDefault(x => x.Day == DateOnly.FromDateTime(date));
 
         if (shiftDay is null || shiftDay.IsOffDay)
         {
             detail.IsWorkingDay = false;
-            detail.Status = AttendanceStatus.OffDay.ToString();
+            detail.Status = nameof(AttendanceStatus.OffDay);
             return detail;
         }
 
         detail.IsWorkingDay = true;
 
-        ShiftDayDetail? firstDetail = shiftDay.ShiftDayDetails?.OrderBy(x => x.From).FirstOrDefault();
-        ShiftDayDetail? lastDetail = shiftDay.ShiftDayDetails?.OrderByDescending(x => x.To).FirstOrDefault();
+        TimeOnly? expectedStart = shiftDay.ShiftDayDetails?.OrderBy(x => x.From).FirstOrDefault()?.From;
+        TimeOnly? expectedEnd = shiftDay.ShiftDayDetails?.OrderByDescending(x => x.To).FirstOrDefault()?.To;
 
-        detail.ExpectedStart = firstDetail?.From.ToString();
-        detail.ExpectedEnd = lastDetail?.To.ToString();
+        detail.ExpectedStart = expectedStart?.ToString("HH:mm");
+        detail.ExpectedEnd = expectedEnd?.ToString("HH:mm");
 
         AttendanceLog? log = logs.FirstOrDefault(x => x.Date.Date == date.Date);
 
         if (log?.CheckIn is not null)
         {
-            detail.ActualCheckIn = log.CheckIn.ToString();
-            detail.ActualCheckOut = log.CheckOut.ToString();
+            detail.ActualCheckIn = log.CheckIn.Value.ToString("HH:mm");
+            detail.ActualCheckOut = log.CheckOut?.ToString("HH:mm");
 
-            if (!string.IsNullOrEmpty(detail.ExpectedStart))
+            if (expectedStart.HasValue)
             {
                 TimeSpan checkInValue = log.CheckIn.Value.ToTimeSpan();
-                TimeSpan latestAllowed = TimeSpan.Parse(detail.ExpectedStart).Add(TimeSpan.FromMinutes(shift!.GracePeriodMinutes));
+                TimeSpan latestAllowed = expectedStart.Value.ToTimeSpan()
+                    .Add(TimeSpan.FromMinutes(shift.GracePeriodMinutes));
 
                 if (checkInValue > latestAllowed)
                     detail.LateMinutes = (int)(checkInValue - latestAllowed).TotalMinutes;
             }
-            TimeSpan checkOutValue = log.CheckOut!.Value.ToTimeSpan();
-            TimeSpan expectedEndValue = TimeSpan.Parse(detail.ExpectedEnd!);
-
-            if (!string.IsNullOrEmpty(detail.ExpectedEnd) && checkOutValue < expectedEndValue)
-                detail.EarlyLeaveMinutes = (int)(expectedEndValue - checkOutValue).TotalMinutes;
 
             if (log.CheckOut.HasValue)
-                detail.WorkedHours = (decimal)(log.CheckOut.Value - log.CheckIn.Value).TotalHours;
+            {
+                TimeSpan checkOutValue = log.CheckOut.Value.ToTimeSpan();
 
-            detail.Status = AttendanceStatus.Present.ToString();
+                if (expectedEnd.HasValue && checkOutValue < expectedEnd.Value.ToTimeSpan())
+                    detail.EarlyLeaveMinutes = (int)(expectedEnd.Value.ToTimeSpan() - checkOutValue).TotalMinutes;
+
+                detail.WorkedHours = (decimal)(log.CheckOut.Value - log.CheckIn.Value).TotalHours;
+                detail.Status = nameof(AttendanceStatus.Present);
+            }
+            else
+            {
+                // Checked in but never checked out — don't silently treat as Present,
+                // and don't crash on the null CheckOut like the original code did.
+                detail.Status = "Incomplete";
+            }
+
             return detail;
         }
 
@@ -189,27 +293,13 @@ public class AttendanceCalculationService(IUnitOfWork unitOfWork) : IAttendanceC
             {
                 RequestType.Remote => "Remote",
                 RequestType.Permission => "Permission",
-                _ => "Present"
+                _ => nameof(AttendanceStatus.Present)
             };
+
             return detail;
         }
 
         detail.Status = "Absent";
         return detail;
-    }
-
-    private async Task<AttendancePolicy?> ResolvePolicyAsync(Guid employeeId)
-    {
-        Employee? employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeId);
-
-        Guid? departmentId = employee?.EmployeeDepartments
-            .FirstOrDefault(ed => ed.EndDate == null)?.DepartmentId;
-
-        if (departmentId is null) return null;
-
-        Department? department = await _unitOfWork.DepartmentRepository.GetByIdAsync(departmentId.Value);
-        if (department?.PolicyId is null) return null;
-
-        return await _unitOfWork.AttendancePolicyRepository.GetByIdAsync(department.PolicyId.Value);
     }
 }
