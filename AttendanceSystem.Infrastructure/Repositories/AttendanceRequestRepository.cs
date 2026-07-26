@@ -8,7 +8,7 @@ public class AttendanceRequestRepository(AttendanceDbContext context)
         : GenericRepository<AttendanceRequest>(context), IAttendanceRequestRepository
 {
     public async Task<PagedResult<AttendanceRequest>> GetAllWithPaginationAsync(AttendanceRequestSearchDto query)
-    {       
+    {
         IQueryable<AttendanceRequest> q = _context.AttendanceRequests
             .Include(x => x.Employee)
             .AsQueryable();
@@ -63,8 +63,19 @@ public class AttendanceRequestRepository(AttendanceDbContext context)
             .ToListAsync();
     }
 
-      public override async Task<AttendanceRequest?> GetByIdAsync(Guid id)
-        => await _context.AttendanceRequests
-            .Include(x => x.Employee)
-            .FirstOrDefaultAsync(x => x.Id == id);
+    public override async Task<AttendanceRequest?> GetByIdAsync(Guid id)
+    => await _context.AttendanceRequests
+        .Include(x => x.Employee)
+        .FirstOrDefaultAsync(x => x.Id == id);
+
+    public async Task<IReadOnlyList<AttendanceRequest>> GetApprovedRequestsAsync(List<Guid> employeeIds, DateTime from, DateTime to)
+    {
+        return await _context.AttendanceRequests
+            .Where(x =>
+                employeeIds.Contains(x.EmployeeId) &&
+                x.RequestStatus == RequestStatus.Approved &&
+                x.RequestDate >= from &&
+                x.RequestDate <= to)
+            .ToListAsync();
+    }
 }
