@@ -13,6 +13,7 @@ public interface IGenericRepository<TEntity>
     Func<IQueryable<TEntity>, IQueryable<TEntity>>? include = null,
     bool ignoreQueryFilters = false);
     Task<IReadOnlyList<TEntity>> GetAllAsync();
+    Task<IEnumerable<TEntity>> GetAllWithSearchAsync(Expression<Func<TEntity, bool>> predicate);
     Task<TEntity?> GetByIdAsync(Guid id);
     Task<bool> IsExistAsync(Guid id);
     Task AddAsync(TEntity entity);
