@@ -67,4 +67,15 @@ public class LeaveRequestRepository(AttendanceDbContext context)
             .Include(x => x.Employee)
             .Include(x => x.LeaveType)
             .FirstOrDefaultAsync(x => x.Id == id);
+
+    public async Task<IReadOnlyList<LeaveRequest>> GetApprovedRequestsAsync(List<Guid> employeeIds, DateTime from, DateTime to)
+    {
+        return await _context.LeaveRequests
+            .Where(x =>
+                employeeIds.Contains(x.EmployeeId) &&
+                x.Status == LeaveRequestStatus.Approved &&
+                x.StartDate <= to &&
+                x.EndDate >= from)
+            .ToListAsync();
+    }
 }
