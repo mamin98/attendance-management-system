@@ -24,8 +24,8 @@ public class AttendanceReportExportService : IAttendanceReportExportService
         int rowIndex = 2;
         foreach (MonthlyAttendanceReportDto r in reports)
         {
-            sheet.Cell(rowIndex, 1).Value = r.EmployeeData.NameEnglish;
-            sheet.Cell(rowIndex, 2).Value = r.EmployeeData.NameArabic;
+            sheet.Cell(rowIndex, 1).Value = r.EmployeeData?.NameEnglish;
+            sheet.Cell(rowIndex, 2).Value = r.EmployeeData?.NameArabic;
             sheet.Cell(rowIndex, 3).Value = r.WorkingDaysInMonth;
             sheet.Cell(rowIndex, 4).Value = r.PresentDays;
             sheet.Cell(rowIndex, 5).Value = r.AbsentDays;
