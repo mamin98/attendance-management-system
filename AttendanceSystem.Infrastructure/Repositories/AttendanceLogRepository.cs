@@ -11,10 +11,10 @@ public class AttendanceLogRepository(AttendanceDbContext context)
         => await _context.AttendanceLogs
             .FirstOrDefaultAsync(x => x.EmployeeId == employeeId && x.Date.Date == date.Date);
 
-    public async Task<IReadOnlyList<AttendanceLog>> GetByEmployeeAndMonthAsync(Guid employeeId, int year, int month)
+    public async Task<IReadOnlyList<AttendanceLog>> GetByEmployeesAndMonthAsync(List<Guid> employeeIds, int year, int month)
         => await _context.AttendanceLogs
             .AsNoTracking()
-            .Where(x => x.EmployeeId == employeeId && x.Date.Year == year && x.Date.Month == month)
+            .Where(x => employeeIds.Contains(x.EmployeeId) && x.Date.Year == year && x.Date.Month == month)
             .ToListAsync();
 
     public async Task AddRangeAsync(IEnumerable<AttendanceLog> entities)
