@@ -57,6 +57,7 @@ public static class DependencyInjection
         services.AddScoped<ILeaveTypeRepository, LeaveTypeRepository>();
         services.AddScoped<IEmployeeRepository, EmployeeRepository>();
         services.AddScoped<IShiftDayRepository, ShiftDayRepository>();
+        services.AddScoped<IHolidayRepository, HolidayRepository>();
         services.AddScoped<IShiftRepository, ShiftRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -72,9 +73,10 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
         services.AddScoped<ILeaveTypeService, LeaveTypeService>();
+        services.AddScoped<IHolidayService, HolidayService>();
         services.AddScoped<IShiftService, ShiftService>();
         services.AddScoped<IAuthService, AuthService>();
-
+        
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
