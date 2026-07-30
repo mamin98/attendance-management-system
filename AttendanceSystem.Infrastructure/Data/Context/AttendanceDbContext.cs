@@ -32,6 +32,7 @@ public class AttendanceDbContext : DbContext
     public DbSet<EmployeeLeaveBalance> EmployeeLeaveBalances { get; set; }
     public DbSet<LeaveRequest> LeaveRequests { get; set; }
     public DbSet<AttendanceLog> AttendanceLogs { get; set; }
+    public DbSet<Holiday> Holidays { get; set; }
 
 
 
