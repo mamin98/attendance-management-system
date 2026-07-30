@@ -1,3 +1,4 @@
+using System.Globalization;
 using AttendanceSystem.Domain;
 
 namespace AttendanceSystem.Application;
@@ -67,7 +68,7 @@ public class AttendancePolicyService(IUnitOfWork unitOfWork) : IAttendancePolicy
     }
 
     public async Task ValidateRequestAgainstPolicyAsync(
-        Guid employeeId, RequestType requestType, DateTime requestDate, TimeSpan? fromTime, TimeSpan? toTime)
+        Guid employeeId, RequestType requestType, string requestDate, string? fromTime, string? toTime)
     {
         Employee? employee = await _unitOfWork.EmployeeRepository.GetByIdAsync(employeeId);
         if (employee is null) return;
@@ -83,13 +84,21 @@ public class AttendancePolicyService(IUnitOfWork unitOfWork) : IAttendancePolicy
         AttendancePolicy? policy = await _unitOfWork.AttendancePolicyRepository.GetByIdAsync(department.PolicyId.Value);
         if (policy is null) return;
 
-        DateTime monthStart = new(requestDate.Year, requestDate.Month, 1);
-        DateTime monthEnd = monthStart.AddMonths(1).AddDays(-1);
+        DateOnly requestDateValue = DateOnly.ParseExact(
+        requestDate,
+        AttendanceSystemConsts.DateFormat,
+        CultureInfo.InvariantCulture);
 
+        DateOnly monthStart = new(requestDateValue.Year, requestDateValue.Month, 1);
+        DateOnly monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+        TimeOnly? fromTimeValue = ParseTime(fromTime);
+        TimeOnly? toTimeValue = ParseTime(toTime);
+        
         List<AttendanceRequest> monthlyRequests = [.. (await _unitOfWork.AttendanceRequestRepository
             .GetEmployeeRequestsAsync(employeeId))
-            .Where(x => x.RequestDate >= monthStart
-                && x.RequestDate <= monthEnd
+            .Where(x => DateOnly.FromDateTime(x.RequestDate) >= monthStart
+                && DateOnly.FromDateTime(x.RequestDate) <= monthEnd
                 && x.RequestStatus != RequestStatus.Rejected
                 && x.RequestStatus != RequestStatus.Cancelled)];
 
@@ -118,8 +127,8 @@ public class AttendancePolicyService(IUnitOfWork unitOfWork) : IAttendancePolicy
                     .Where(x => x.RequestType == RequestType.Late && x.FromTime.HasValue && x.ToTime.HasValue)
                     .Sum(x => (int)(x.ToTime!.Value - x.FromTime!.Value).TotalMinutes);
 
-                int incomingMinutes = fromTime.HasValue && toTime.HasValue
-                    ? (int)(toTime.Value - fromTime.Value).TotalMinutes
+                int incomingMinutes = fromTimeValue.HasValue && toTimeValue.HasValue
+                    ? (int)(toTimeValue.Value - fromTimeValue.Value).TotalMinutes
                     : 0;
 
                 if (lateMinutesThisMonth + incomingMinutes > policy.MaxLateMinutesPerMonth)
@@ -127,4 +136,12 @@ public class AttendancePolicyService(IUnitOfWork unitOfWork) : IAttendancePolicy
                 break;
         }
     }
+
+    static TimeOnly? ParseTime(string? value)
+    {
+        return TimeOnly.TryParse(value, out var time)
+            ? time
+            : null;
+    }
+
 }

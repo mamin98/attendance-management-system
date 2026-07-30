@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace AttendanceSystem.Domain;
 
 public class AttendanceRequest : BaseEntity
@@ -51,16 +53,22 @@ public class AttendanceRequest : BaseEntity
         return this;
     }
 
-    private AttendanceRequest SetDate(DateTime date)
+
+    private AttendanceRequest SetDate(string date)
     {
-        RequestDate = date;
+        RequestDate = DateTime.ParseExact(
+            date,
+            AttendanceSystemConsts.DateFormat,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None).Date;
+
         return this;
     }
 
-    private AttendanceRequest SetTime(TimeSpan? from, TimeSpan? to)
+    private AttendanceRequest SetTimes(string? from, string? to)
     {
-        FromTime = from;
-        ToTime = to;
+        FromTime = string.IsNullOrEmpty(from) ? null : TimeSpan.Parse(from);
+        ToTime = string.IsNullOrEmpty(to) ? null : TimeSpan.Parse(to);
 
         return this;
     }
@@ -75,33 +83,33 @@ public class AttendanceRequest : BaseEntity
     public static AttendanceRequest Create(
      Guid employeeId,
      RequestType type,
-     DateTime date,
-     TimeSpan? from,
-     TimeSpan? to,
+     string date,
+     string? from,
+     string? to,
      string? reason = null)
      => new AttendanceRequest()
          .ApplyData(employeeId, type, date, from, to, reason);
 
     public AttendanceRequest Update(
      RequestType type,
-     DateTime date,
-     TimeSpan? from,
-     TimeSpan? to,
+     string date,
+     string? from,
+     string? to,
      string? reason)
      => ApplyData(EmployeeId, type, date, from, to, reason);
 
     private AttendanceRequest ApplyData(
         Guid employeeId,
         RequestType type,
-        DateTime date,
-        TimeSpan? from,
-        TimeSpan? to,
+        string date,
+        string? from,
+        string? to,
         string? reason)
     {
         SetEmployeeId(employeeId)
         .SetRequestType(type)
         .SetDate(date)
-        .SetTime(from, to)
+        .SetTimes(from, to)
         .SetReason(reason ?? string.Empty);
 
         return this;

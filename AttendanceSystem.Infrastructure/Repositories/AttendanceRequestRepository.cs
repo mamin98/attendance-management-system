@@ -9,6 +9,9 @@ public class AttendanceRequestRepository(AttendanceDbContext context)
 {
     public async Task<PagedResult<AttendanceRequest>> GetAllWithPaginationAsync(AttendanceRequestSearchDto query)
     {
+        DateOnly fromDate = DateAndTimeHelperConvert.GetDateOnly(query.FromDate);
+        DateOnly toDate = DateAndTimeHelperConvert.GetDateOnly(query.ToDate);
+
         IQueryable<AttendanceRequest> q = _context.AttendanceRequests
             .Include(x => x.Employee)
             .AsQueryable();
@@ -31,11 +34,11 @@ public class AttendanceRequestRepository(AttendanceDbContext context)
         if (query.RequestStatus.HasValue)
             q = q.Where(x => x.RequestStatus == query.RequestStatus);
 
-        if (query.FromDate.HasValue)
-            q = q.Where(x => x.RequestDate >= query.FromDate);
+        if (fromDate != DateOnly.MinValue)
+            q = q.Where(x => DateOnly.FromDateTime(x.RequestDate) >= fromDate);
 
-        if (query.ToDate.HasValue)
-            q = q.Where(x => x.RequestDate <= query.ToDate);
+        if (toDate != DateOnly.MinValue)
+            q = q.Where(x => DateOnly.FromDateTime(x.RequestDate) <= toDate);
 
         int totalCount = await q.CountAsync();
 

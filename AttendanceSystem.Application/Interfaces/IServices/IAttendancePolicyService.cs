@@ -12,5 +12,5 @@ public interface IAttendancePolicyService
     Task DeleteAsync(Guid id);
     Task AssignToDepartmentAsync(AssignPolicyToDepartmentDto dto);
     Task ValidateRequestAgainstPolicyAsync(
-        Guid employeeId, RequestType requestType, DateTime requestDate, TimeSpan? fromTime, TimeSpan? toTime);
+        Guid employeeId, RequestType requestType, string requestDate, string? fromTime, string? toTime);
 }

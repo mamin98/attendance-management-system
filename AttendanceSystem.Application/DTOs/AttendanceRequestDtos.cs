@@ -46,9 +46,9 @@ public class UpdateAttendanceRequestDto : AttendanceRequestBaseDto
 
 public class AttendanceRequestBaseDto
 {
-    public DateTime RequestDate { get; set; }
-    public TimeSpan? FromTime { get; set; }
-    public TimeSpan? ToTime { get; set; }
+    public string RequestDate { get; set; } = string.Empty;
+    public string? FromTime { get; set; }
+    public string? ToTime { get; set; }
     public string? Reason { get; set; }
 }
 
@@ -58,6 +58,6 @@ public class AttendanceRequestSearchDto : SearchDto
     public Guid? EmployeeId { get; set; }
     public RequestType? RequestType { get; set; }
     public RequestStatus? RequestStatus { get; set; }
-    public DateTime? FromDate { get; set; }
-    public DateTime? ToDate { get; set; }
+    public string? FromDate { get; set; }
+    public string? ToDate { get; set; }
 }

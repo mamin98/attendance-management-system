@@ -12,9 +12,9 @@ public static class AttendanceRequestMapping
             EmployeeData = entity.Employee?.ToSimpleDto(),
             RequestType = entity.RequestType.ToString(),
             RequestStatus = entity.RequestStatus.ToString(),
-            RequestDate = entity.RequestDate,
-            FromTime = entity.FromTime,
-            ToTime = entity.ToTime,
+            RequestDate = entity.RequestDate.ToString(AttendanceSystemConsts.DateFormat),
+            FromTime = entity.FromTime.ToString(),
+            ToTime = entity.ToTime.ToString(),
             Reason = entity.Reason
         };
     }

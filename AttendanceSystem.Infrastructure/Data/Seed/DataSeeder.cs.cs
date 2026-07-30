@@ -97,16 +97,16 @@ public class DataSeeder(AttendanceDbContext context, IPasswordHasher passwordHas
         AttendanceRequest att1 = AttendanceRequest.Create(
             emp1.Id,
             RequestType.Late,
-            DateTime.UtcNow.Date,
-            new TimeSpan(9, 0, 0),
-            new TimeSpan(10, 0, 0),
+            DateTime.UtcNow.Date.ToString(),
+            new TimeSpan(9, 0, 0).ToString(),
+            new TimeSpan(10, 0, 0).ToString(),
             "Traffic"
         );
 
         AttendanceRequest att2 = AttendanceRequest.Create(
             emp2.Id,
             RequestType.Remote,
-            DateTime.UtcNow.Date.AddDays(-1),
+            DateTime.UtcNow.Date.AddDays(-1).ToString(),
             null,
             null,
             "WFH"
