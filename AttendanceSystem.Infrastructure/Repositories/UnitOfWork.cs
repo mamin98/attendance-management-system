@@ -103,6 +103,11 @@ public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
     public IAttendanceLogRepository AttendanceLogRepository
         => _attendanceLogRepository ??= new AttendanceLogRepository(_context);
 
+    private IHolidayRepository? _holidayRepository;
+    public IHolidayRepository HolidayRepository
+        => _holidayRepository ??= new HolidayRepository(_context);
+
+        
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     => await _context.SaveChangesAsync(cancellationToken);

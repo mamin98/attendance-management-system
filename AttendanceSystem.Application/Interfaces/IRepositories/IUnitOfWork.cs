@@ -19,6 +19,7 @@ public interface IUnitOfWork
     IEmployeeLeaveBalanceRepository EmployeeLeaveBalanceRepository { get; }
     ILeaveRequestRepository LeaveRequestRepository { get; }
     IAttendanceLogRepository AttendanceLogRepository { get; }
+    IHolidayRepository HolidayRepository { get; }
     
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
