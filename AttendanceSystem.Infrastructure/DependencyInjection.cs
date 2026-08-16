@@ -49,7 +49,9 @@ public static class DependencyInjection
         services.AddScoped<IEmployeeDepartmentRepository, EmployeeDepartmentRepository>();
         services.AddScoped<IAttendanceRequestRepository, AttendanceRequestRepository>();
         services.AddScoped<IAttendancePolicyRepository, AttendancePolicyRepository>();
+        services.AddScoped<ISalaryStructureRepository, SalaryStructureRepository>();
         services.AddScoped<IShiftDayDetailRepository, ShiftDayDetailRepository>();
+        services.AddScoped<IPayrollRecordRepository, PayrollRecordRepository>();
         services.AddScoped<IEmployeeShiftRepository, EmployeeShiftRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<ILeaveRequestRepository, LeaveRequestRepository>();
@@ -62,21 +64,25 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
+
+
         services.AddScoped<IAttendanceReportExportService, AttendanceReportExportService>();
         services.AddScoped<IAttendanceCalculationService, AttendanceCalculationService>();
         services.AddScoped<IEmployeeDepartmentService, EmployeeDepartmentService>();
         services.AddScoped<IAttendanceRequestService, AttendanceRequestService>();
         services.AddScoped<IAttendancePolicyService, AttendancePolicyService>();
         services.AddScoped<IAttendanceLogRepository, AttendanceLogRepository>();
-        services.AddScoped<IAttendanceImportService, AttendanceImportService>(); 
+        services.AddScoped<IAttendanceImportService, AttendanceImportService>();
+        services.AddScoped<ISalaryStructureService, SalaryStructureService>();
         services.AddScoped<ILeaveRequestService, LeaveRequestService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<IAttachmentService, AttachmentService>();
         services.AddScoped<ILeaveTypeService, LeaveTypeService>();
         services.AddScoped<IHolidayService, HolidayService>();
+        services.AddScoped<IPayrollService, PayrollService>();
         services.AddScoped<IShiftService, ShiftService>();
         services.AddScoped<IAuthService, AuthService>();
-        
+
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
