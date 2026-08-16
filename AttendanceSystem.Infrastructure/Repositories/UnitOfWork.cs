@@ -107,7 +107,15 @@ public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
     public IHolidayRepository HolidayRepository
         => _holidayRepository ??= new HolidayRepository(_context);
 
-        
+    private ISalaryStructureRepository? _salaryStructureRepository;
+    public ISalaryStructureRepository SalaryStructureRepository
+        => _salaryStructureRepository ??= new SalaryStructureRepository(_context);
+
+    private IPayrollRecordRepository? _payrollRecordRepository;
+    public IPayrollRecordRepository PayrollRecordRepository
+        => _payrollRecordRepository ??= new PayrollRecordRepository(_context);
+
+
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     => await _context.SaveChangesAsync(cancellationToken);

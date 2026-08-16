@@ -1,5 +1,3 @@
-using AttendanceSystem.Domain;
-
 namespace AttendanceSystem.Application;
 
 public interface IUnitOfWork
@@ -20,7 +18,9 @@ public interface IUnitOfWork
     ILeaveRequestRepository LeaveRequestRepository { get; }
     IAttendanceLogRepository AttendanceLogRepository { get; }
     IHolidayRepository HolidayRepository { get; }
-    
+    ISalaryStructureRepository SalaryStructureRepository { get; }
+    IPayrollRecordRepository PayrollRecordRepository { get; }
+ 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 
