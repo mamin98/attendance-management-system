@@ -13,7 +13,16 @@ public static class DateAndTimeHelperConvert
                 date,
                 AttendanceSystemConsts.DateFormat,
                 CultureInfo.InvariantCulture);
+    }
 
+    public static DateTime GetDateTime(string? date)
+    {
+        return date is null
+            ? DateTime.MinValue
+            : DateTime.ParseExact(
+                date,
+                AttendanceSystemConsts.DateFormat,
+                CultureInfo.InvariantCulture);
     }
     public static DateTime GetLocalDataTime(DateTime date) => date.ToLocalTime();    
 
