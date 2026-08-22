@@ -1,16 +1,14 @@
 using AttendanceSystem.Domain;
-using Microsoft.Extensions.Logging;
+using Hangfire;
 
 namespace AttendanceSystem.Application;
 
 public class LeaveRequestService(
     IUnitOfWork unitOfWork,
-    IEmailService emailService,
-    ILogger<LeaveRequestService> logger) : ILeaveRequestService
+    IBackgroundJobClient backgroundJobClient) : ILeaveRequestService
 {
     readonly IUnitOfWork _unitOfWork = unitOfWork;
-    readonly IEmailService _emailService = emailService;
-    readonly ILogger<LeaveRequestService> _logger = logger;
+    readonly IBackgroundJobClient _backgroundJobClient = backgroundJobClient;
 
     public async Task<PagedResult<LeaveRequestDto>> GetAllWithPaginationAsync(LeaveRequestSearchDto search)
     {
@@ -86,7 +84,7 @@ public class LeaveRequestService(
         _unitOfWork.LeaveRequestRepository.Update(entity);
         await _unitOfWork.SaveChangesAsync();
 
-        _ = SendStatusEmailAsync(entity, "Approved");
+        _backgroundJobClient.Enqueue<ILeaveEmailJob>(x => x.SendLeaveStatusEmailAsync(id, "Approved"));
     }
 
     public async Task RejectAsync(Guid id)
@@ -99,7 +97,7 @@ public class LeaveRequestService(
         _unitOfWork.LeaveRequestRepository.Update(entity);
         await _unitOfWork.SaveChangesAsync();
 
-        _ = SendStatusEmailAsync(entity, "Rejected");
+        _backgroundJobClient.Enqueue<ILeaveEmailJob>(x => x.SendLeaveStatusEmailAsync(id, "Rejected"));
     }
 
     public async Task CancelAsync(Guid id)
@@ -146,25 +144,5 @@ public class LeaveRequestService(
 
         if (requiredDays > balance.RemainingDays)
             throw new ValidationException($"Insufficient leave balance. Remaining: {balance.RemainingDays} day(s), requested: {requiredDays} day(s)");
-    }
-
-    private async Task SendStatusEmailAsync(LeaveRequest request, string status)
-    {
-        try
-        {
-            if (request.Employee?.Email is null) return;
-
-            await _emailService.SendAsync(
-                request.Employee.Email,
-                $"Leave Request {status}",
-                $"Your leave request from {request.StartDate:dd/MM/yyyy} to {request.EndDate:dd/MM/yyyy} has been {status.ToLower()}."
-            );
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(ex,
-                "Failed to send leave status email for LeaveRequest {RequestId} to employee {EmployeeId}",
-                request.Id, request.EmployeeId);
-        }
     }
 }

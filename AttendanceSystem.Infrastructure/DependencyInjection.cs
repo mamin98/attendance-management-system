@@ -85,8 +85,10 @@ public static class DependencyInjection
 
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IAttendanceEmailJob, AttendanceEmailJob>();
         services.AddScoped<IPasswordHasher, BcryptPasswordHasher>();
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<ILeaveEmailJob, LeaveEmailJob>();
         services.AddScoped<IEmailService, EmailService>();
 
 
