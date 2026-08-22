@@ -1,9 +1,10 @@
-using AttendanceSystem.Application;
-using AttendanceSystem.Infrastructure;
-using FluentValidation.AspNetCore;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
+using FluentValidation.AspNetCore;
+using AttendanceSystem.Application;
+using Microsoft.EntityFrameworkCore;
+using AttendanceSystem.Infrastructure;
+
 
 namespace AttendanceSystem.API;
 
@@ -75,6 +76,9 @@ public class Program
                     });
             });
 
+
+            builder.Services.AddHangfireServices(builder.Configuration);
+
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
@@ -102,6 +106,8 @@ public class Program
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseHangfireDashboardWithAuth();   
 
             app.MapControllers();
 
