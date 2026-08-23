@@ -6,7 +6,7 @@ namespace AttendanceSystem.Infrastructure;
 public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
 {
     readonly AttendanceDbContext _context = context;
-    
+
     private IEmployeeRepository? _employeeRepository;
     public IEmployeeRepository EmployeeRepository
     {
@@ -66,6 +66,55 @@ public class UnitOfWork(AttendanceDbContext context) : IUnitOfWork
                 ??= new EmployeeDepartmentRepository(_context);
         }
     }
+
+    private IShiftRepository? _shiftRepository;
+    public IShiftRepository ShiftRepository
+        => _shiftRepository ??= new ShiftRepository(_context);
+
+    private IShiftDayRepository? _shiftDayRepository;
+    public IShiftDayRepository ShiftDayRepository
+        => _shiftDayRepository ??= new ShiftDayRepository(_context);
+
+    private IShiftDayDetailRepository? _shiftDayDetailRepository;
+    public IShiftDayDetailRepository ShiftDayDetailRepository
+        => _shiftDayDetailRepository ??= new ShiftDayDetailRepository(_context);
+
+    private IEmployeeShiftRepository? _employeeShiftRepository;
+    public IEmployeeShiftRepository EmployeeShiftRepository
+        => _employeeShiftRepository ??= new EmployeeShiftRepository(_context);
+
+    private IAttendancePolicyRepository? _attendancePolicyRepository;
+    public IAttendancePolicyRepository AttendancePolicyRepository
+        => _attendancePolicyRepository ??= new AttendancePolicyRepository(_context);
+
+    private ILeaveTypeRepository? _leaveTypeRepository;
+    public ILeaveTypeRepository LeaveTypeRepository
+        => _leaveTypeRepository ??= new LeaveTypeRepository(_context);
+
+    private IEmployeeLeaveBalanceRepository? _employeeLeaveBalanceRepository;
+    public IEmployeeLeaveBalanceRepository EmployeeLeaveBalanceRepository
+        => _employeeLeaveBalanceRepository ??= new EmployeeLeaveBalanceRepository(_context);
+
+    private ILeaveRequestRepository? _leaveRequestRepository;
+    public ILeaveRequestRepository LeaveRequestRepository
+        => _leaveRequestRepository ??= new LeaveRequestRepository(_context);
+
+    private IAttendanceLogRepository? _attendanceLogRepository;
+    public IAttendanceLogRepository AttendanceLogRepository
+        => _attendanceLogRepository ??= new AttendanceLogRepository(_context);
+
+    private IHolidayRepository? _holidayRepository;
+    public IHolidayRepository HolidayRepository
+        => _holidayRepository ??= new HolidayRepository(_context);
+
+    private ISalaryStructureRepository? _salaryStructureRepository;
+    public ISalaryStructureRepository SalaryStructureRepository
+        => _salaryStructureRepository ??= new SalaryStructureRepository(_context);
+
+    private IPayrollRecordRepository? _payrollRecordRepository;
+    public IPayrollRecordRepository PayrollRecordRepository
+        => _payrollRecordRepository ??= new PayrollRecordRepository(_context);
+
 
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)

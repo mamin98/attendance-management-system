@@ -9,14 +9,7 @@ public class DepartmentService(IUnitOfWork unitOfWork) : IDepartmentService
     public async Task<PagedResult<DepartmentDto>> GetAllWithPaginationAsync(DepartmentSearchDto search)
     {
         PagedResult<Department> data = await _unitOfWork.DepartmentRepository.GetAllWithPaginationAsync(search);
-
-        return new PagedResult<DepartmentDto>
-        {
-            Items = [.. data.Items.Select(x => x.ToDto())],
-            TotalCount = data.TotalCount,
-            Page = data.Page,
-            PageSize = data.PageSize
-        };
+        return data.ToPagedDto(x => x.ToDto());
     }
 
     public async Task<List<DepartmentDto>> GetAllAsync()

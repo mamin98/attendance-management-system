@@ -13,7 +13,12 @@ public class Employee : BaseEntity
     public virtual ICollection<Department> DepartmentManagers { get; private set; } = [];
     public virtual ICollection<RefreshToken> RefreshTokens { get; private set; } = [];
     public virtual ICollection<EmployeeShift> EmployeeShifts { get; private set; } = [];
-
+    public virtual ICollection<EmployeeLeaveBalance> LeaveBalances { get; private set; } = [];
+    public virtual ICollection<LeaveRequest> LeaveRequests { get; private set; } = [];
+    public virtual ICollection<AttendanceLog> AttendanceLogs { get; private set; } = [];
+    public virtual SalaryStructure? SalaryStructure { get; private set; }
+    public virtual ICollection<PayrollRecord> PayrollRecords { get; private set; } = [];
+    
     private Employee SetNameEnglish(string name)
     {
         NameEnglish = name.Trim();

@@ -9,6 +9,7 @@ public class Department : BaseEntity
     public virtual ICollection<EmployeeDepartment> EmployeeDepartments { get; private set; } = [];
     public Guid? PolicyId { get; private set; }
     public virtual AttendancePolicy? Policy { get; private set; }
+    public virtual ICollection<Holiday> Holidays { get; private set; } = [];
 
 
     public Department SetManagerId(Guid? managerId)

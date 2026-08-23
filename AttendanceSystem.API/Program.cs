@@ -1,9 +1,10 @@
-using AttendanceSystem.Application;
-using AttendanceSystem.Infrastructure;
-using FluentValidation.AspNetCore;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
+using FluentValidation.AspNetCore;
+using AttendanceSystem.Application;
+using Microsoft.EntityFrameworkCore;
+using AttendanceSystem.Infrastructure;
+
 
 namespace AttendanceSystem.API;
 
@@ -15,7 +16,7 @@ public class Program
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
             .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
             .Enrich.FromLogContext()
             .WriteTo.Console()
             .WriteTo.File(
@@ -75,6 +76,9 @@ public class Program
                     });
             });
 
+
+            builder.Services.AddHangfireServices(builder.Configuration);
+
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
@@ -102,6 +106,8 @@ public class Program
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseHangfireDashboardWithAuth();   
 
             app.MapControllers();
 

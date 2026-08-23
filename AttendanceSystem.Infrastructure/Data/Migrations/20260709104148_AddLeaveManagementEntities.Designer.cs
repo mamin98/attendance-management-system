@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AttendanceSystem.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(AttendanceDbContext))]
-    [Migration("20260705132154_Add_AttendancePolicy_Entity")]
-    partial class Add_AttendancePolicy_Entity
+    [Migration("20260709104148_AddLeaveManagementEntities")]
+    partial class AddLeaveManagementEntities
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -116,18 +116,22 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.Property<string>("NameArabic")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("NameEnglish")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("RequiresManagerApproval")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.HasKey("Id");
 
-                    b.ToTable("AttendancePolicy");
+                    b.ToTable("AttendancePolicies");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.AttendanceRequest", b =>
@@ -344,6 +348,58 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
                     b.ToTable("EmployeeDepartments");
                 });
 
+            modelBuilder.Entity("AttendanceSystem.Domain.EmployeeLeaveBalance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("AllocatedDays")
+                        .HasColumnType("decimal(5,1)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("LeaveTypeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("UsedDays")
+                        .HasColumnType("decimal(5,1)");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeaveTypeId");
+
+                    b.HasIndex("EmployeeId", "LeaveTypeId", "Year")
+                        .IsUnique();
+
+                    b.ToTable("EmployeeLeaveBalances");
+                });
+
             modelBuilder.Entity("AttendanceSystem.Domain.EmployeeShift", b =>
                 {
                     b.Property<Guid>("Id")
@@ -389,7 +445,121 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("EmployeeShift");
+                    b.ToTable("EmployeeShifts");
+                });
+
+            modelBuilder.Entity("AttendanceSystem.Domain.LeaveRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal>("DaysCount")
+                        .HasColumnType("decimal(5,1)");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<Guid>("LeaveTypeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("LeaveTypeId");
+
+                    b.ToTable("LeaveRequests");
+                });
+
+            modelBuilder.Entity("AttendanceSystem.Domain.LeaveType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("DefaultDaysPerYear")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
+                    b.Property<bool>("IsPaid")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NameArabic")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NameEnglish")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("RequiresApproval")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LeaveTypes");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.RefreshToken", b =>
@@ -493,7 +663,7 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Shift");
+                    b.ToTable("Shifts");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.ShiftDay", b =>
@@ -536,7 +706,7 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("ShiftDay");
+                    b.ToTable("ShiftDays");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.ShiftDayDetail", b =>
@@ -584,7 +754,7 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasIndex("ShiftId");
 
-                    b.ToTable("ShiftDayDetail");
+                    b.ToTable("ShiftDayDetails");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.AttendanceAttachment", b =>
@@ -618,7 +788,8 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.HasOne("AttendanceSystem.Domain.AttendancePolicy", "Policy")
                         .WithMany("Departments")
-                        .HasForeignKey("PolicyId");
+                        .HasForeignKey("PolicyId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Manager");
 
@@ -642,6 +813,25 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
                     b.Navigation("Employee");
                 });
 
+            modelBuilder.Entity("AttendanceSystem.Domain.EmployeeLeaveBalance", b =>
+                {
+                    b.HasOne("AttendanceSystem.Domain.Employee", "Employee")
+                        .WithMany("LeaveBalances")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AttendanceSystem.Domain.LeaveType", "LeaveType")
+                        .WithMany("Balances")
+                        .HasForeignKey("LeaveTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("LeaveType");
+                });
+
             modelBuilder.Entity("AttendanceSystem.Domain.EmployeeShift", b =>
                 {
                     b.HasOne("AttendanceSystem.Domain.Employee", "Employee")
@@ -657,6 +847,25 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("Shift");
+                });
+
+            modelBuilder.Entity("AttendanceSystem.Domain.LeaveRequest", b =>
+                {
+                    b.HasOne("AttendanceSystem.Domain.Employee", "Employee")
+                        .WithMany("LeaveRequests")
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("AttendanceSystem.Domain.LeaveType", "LeaveType")
+                        .WithMany("LeaveRequests")
+                        .HasForeignKey("LeaveTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("LeaveType");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.RefreshToken", b =>
@@ -725,7 +934,18 @@ namespace AttendanceSystem.Infrastructure.Data.Migrations
 
                     b.Navigation("EmployeeShifts");
 
+                    b.Navigation("LeaveBalances");
+
+                    b.Navigation("LeaveRequests");
+
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("AttendanceSystem.Domain.LeaveType", b =>
+                {
+                    b.Navigation("Balances");
+
+                    b.Navigation("LeaveRequests");
                 });
 
             modelBuilder.Entity("AttendanceSystem.Domain.Shift", b =>

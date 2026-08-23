@@ -14,14 +14,7 @@ public class EmployeeService(
     public async Task<PagedResult<EmployeeDto>> GetAllWithPaginationAsync(EmployeeSearchDto search)
     {
         PagedResult<Employee> data = await _unitOfWork.EmployeeRepository.GetAllWithPaginationAsync(search);
-
-        return new PagedResult<EmployeeDto>
-        {
-            Items = [.. data.Items.Select(x => x.ToDto())],
-            TotalCount = data.TotalCount,
-            Page = data.Page,
-            PageSize = data.PageSize
-        };
+        return data.ToPagedDto(x => x.ToDto());
     }
 
     public async Task<List<EmployeeDto>> GetAllAsync()

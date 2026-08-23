@@ -31,3 +31,23 @@ public enum RefreshTokenExpiry
     ThirtyDays   = 30,
     NinetyDays   = 90
 }
+
+public enum LeaveRequestStatus
+{
+    Pending = 1,
+    Approved,
+    Rejected,
+    Cancelled
+}
+
+
+public enum AttendanceStatus
+{
+    Present = 1,
+    Absent,
+    OffDay,
+    OnLeave,
+    Remote,
+    Permission,
+    NoShiftAssigned
+}

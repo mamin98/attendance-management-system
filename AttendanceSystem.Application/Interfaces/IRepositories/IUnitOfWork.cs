@@ -1,5 +1,3 @@
-using  AttendanceSystem.Domain;
-
 namespace AttendanceSystem.Application;
 
 public interface IUnitOfWork
@@ -10,7 +8,19 @@ public interface IUnitOfWork
     IRefreshTokenRepository RefreshTokenRepository { get; }
     IAttachmentRepository AttachmentRepository { get; }
     IEmployeeDepartmentRepository EmployeeDepartmentRepository { get; }
-
+    IAttendancePolicyRepository AttendancePolicyRepository { get; }
+    IShiftRepository ShiftRepository { get; }
+    IShiftDayRepository ShiftDayRepository { get; }
+    IShiftDayDetailRepository ShiftDayDetailRepository { get; }
+    IEmployeeShiftRepository EmployeeShiftRepository { get; }
+    ILeaveTypeRepository LeaveTypeRepository { get; }
+    IEmployeeLeaveBalanceRepository EmployeeLeaveBalanceRepository { get; }
+    ILeaveRequestRepository LeaveRequestRepository { get; }
+    IAttendanceLogRepository AttendanceLogRepository { get; }
+    IHolidayRepository HolidayRepository { get; }
+    ISalaryStructureRepository SalaryStructureRepository { get; }
+    IPayrollRecordRepository PayrollRecordRepository { get; }
+ 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
 

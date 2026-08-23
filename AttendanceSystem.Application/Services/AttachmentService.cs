@@ -21,14 +21,7 @@ public class AttachmentService(
         IReadOnlyList<AttendanceAttachment> attachments = await _unitOfWork
             .AttachmentRepository.GetByRequestIdAsync(requestId);
 
-        return [.. attachments.Select(x => new AttachmentDto
-            {
-                Id = x.Id,
-                FileName = x.FileName,
-                FileSizeBytes = x.FileSizeBytes,
-                CreatedAt = x.CreatedAt
-            }
-            )];
+        return [.. attachments.Select(x => x.ToDto())];
     }
 
     public async Task AddAsync(Guid requestId, IFormFile file)
@@ -65,11 +58,8 @@ public class AttachmentService(
     public async Task DeleteAsync(Guid attachmentId)
     {
         AttendanceAttachment? attachment = await _unitOfWork.AttachmentRepository
-            .GetByIdAsync(attachmentId);
-
-        if (attachment is null)
-            throw new NotFoundException("Attachment not found");
-
+            .GetByIdAsync(attachmentId) ?? throw new NotFoundException("Attachment not found");
+        
         _fileStorageService.Delete(attachment.FilePath);
 
         _unitOfWork.AttachmentRepository.Delete(attachment);

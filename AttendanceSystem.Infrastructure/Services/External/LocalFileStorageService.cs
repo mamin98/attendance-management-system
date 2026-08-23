@@ -19,6 +19,7 @@ public class LocalFileStorageService(IWebHostEnvironment env) : IFileStorageServ
 
         return Path.Combine("Uploads", folder, fileName);
     }
+    
     public Stream GetStream(string filePath)
     {
         if (!File.Exists(filePath))

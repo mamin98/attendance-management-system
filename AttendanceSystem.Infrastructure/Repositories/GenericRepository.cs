@@ -50,6 +50,10 @@ public class GenericRepository<TEntity>
     public async Task<IReadOnlyList<TEntity>> GetAllAsync()
         => await _context.Set<TEntity>().AsNoTracking().ToListAsync();
 
+    public async Task<IEnumerable<TEntity>> GetAllWithSearchAsync(Expression<Func<TEntity, bool>> predicate)
+        => await _context.Set<TEntity>().Where(predicate).ToListAsync();
+
+
     public virtual async Task<TEntity?> GetByIdAsync(Guid id)
         => await _context.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == id);
 
