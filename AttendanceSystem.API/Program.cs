@@ -12,6 +12,8 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        const string CorsPolicyName = "AttendanceSystemCorsPolicy";
+
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
@@ -79,6 +81,22 @@ public class Program
 
             builder.Services.AddHangfireServices(builder.Configuration);
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(CorsPolicyName, policy =>
+                {
+                    string[] allowedOrigins = builder.Configuration
+                        .GetSection("Cors:AllowedOrigins")
+                        .Get<string[]>() ?? [];
+
+                    policy.WithOrigins(allowedOrigins)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // needed since your Auth flow uses Bearer tokens +
+                                             //  refresh cookies/headers
+                });
+            });
+
             var app = builder.Build();
 
             using (var scope = app.Services.CreateScope())
@@ -104,10 +122,12 @@ public class Program
 
             app.UseHttpsRedirection();
 
+            app.UseCors(CorsPolicyName);
+
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseHangfireDashboardWithAuth();   
+            app.UseHangfireDashboardWithAuth();
 
             app.MapControllers();
 

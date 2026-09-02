@@ -27,3 +27,7 @@ dist/
 Logs/
 **/Logs/
 *.txt
+appsettings.Development.json
+appsettings.*.local.json
+*.pfx
+secrets.json
