@@ -27,3 +27,4 @@ dist/
 Logs/
 **/Logs/
 *.txt
+.env

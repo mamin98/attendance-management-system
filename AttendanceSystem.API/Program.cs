@@ -34,6 +34,12 @@ public class Program
             builder.Host.UseSerilog();
 
             builder.Services.AddInfrastructure(builder.Configuration);
+            builder.Services.AddHealthChecks()
+                .AddSqlServer(
+                    builder.Configuration.GetConnectionString("DefaultConnection")!,
+                    name: "sql-server",
+                    tags: ["db", "sql"]);
+                    
             builder.Services.AddApplication();
 
             builder.Services
@@ -110,6 +116,7 @@ public class Program
             app.UseHangfireDashboardWithAuth();   
 
             app.MapControllers();
+            app.MapHealthChecks("/health");
 
             await app.RunAsync();
         }
